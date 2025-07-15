@@ -1,25 +1,28 @@
-import logo from './logo.svg';
-import './App.css';
+"use client"
+
+import { useState } from "react"
+import Home from "./home/home.jsx"
+import SigninForm from "./register/signin.jsx"
+import SignupForm from "./register/signup.jsx" // Import the SignupForm
 
 function App() {
+  const [currentPage, setCurrentPage] = useState("home") // 'home', 'signin', or 'signup'
+
+  const handleNavigation = (page) => {
+    setCurrentPage(page)
+  }
+
   return (
     <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+      {currentPage === "home" ? (
+        <Home onNavigate={handleNavigation} />
+      ) : currentPage === "signin" ? (
+        <SigninForm onNavigate={handleNavigation} />
+      ) : (
+        <SignupForm onNavigate={handleNavigation} /> // Render SignupForm when currentPage is 'signup'
+      )}
     </div>
-  );
+  )
 }
 
-export default App;
+export default App
