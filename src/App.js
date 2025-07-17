@@ -1,26 +1,27 @@
 "use client"
 
-import { useState } from "react"
-import Home from "./home/home.jsx"
+import { Routes, Route } from "react-router-dom"
+import HomePage from "./home/page.jsx"
+import PropertyManagementPage from "./property-management/page.jsx"
 import SigninForm from "./register/signin.jsx"
-import SignupForm from "./register/signup.jsx" // Import the SignupForm
+import SignupForm from "./register/signup.jsx"
+import AreasOfOurHomesPage from "./areas-of-our-homes/page.jsx"
+import PropertyDetailsPage from "./property-details/page.jsx"
 
 function App() {
-  const [currentPage, setCurrentPage] = useState("home") // 'home', 'signin', or 'signup'
-
-  const handleNavigation = (page) => {
-    setCurrentPage(page)
-  }
-
   return (
     <div className="App">
-      {currentPage === "home" ? (
-        <Home onNavigate={handleNavigation} />
-      ) : currentPage === "signin" ? (
-        <SigninForm onNavigate={handleNavigation} />
-      ) : (
-        <SignupForm onNavigate={handleNavigation} /> // Render SignupForm when currentPage is 'signup'
-      )}
+      <Routes>
+        <Route path="/" element={<HomePage />} />
+        <Route path="/home" element={<HomePage />} />
+        <Route path="/areas-of-our-homes" element={<AreasOfOurHomesPage />} />
+        <Route path="/listing" element={<AreasOfOurHomesPage />} />
+        <Route path="/signin" element={<SigninForm />} />
+        <Route path="/signup" element={<SignupForm />} />
+        <Route path="/property-details" element={<PropertyDetailsPage />} />
+        <Route path="/property-management" element={<PropertyManagementPage />} />
+        <Route path="/property-management" element={require('./property-management/page.jsx').default} />
+      </Routes>
     </div>
   )
 }

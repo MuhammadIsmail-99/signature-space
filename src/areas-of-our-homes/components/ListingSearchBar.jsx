@@ -1,7 +1,7 @@
 "use client"
 
 import { useState } from "react"
-import "./search-bar.css"
+import "../styles/search-bar.css"
 
 const destinations = [
   {
@@ -407,19 +407,24 @@ export default function SearchBar() {
                 <label>Who</label>
                 <span className="guest-text">{totalGuests > 0 ? formatGuestText() : "Add guests"}</span>
               </div>
-              
-              
             </div>
             <div className="divider"></div>
-            <button className="search-button" onClick={handleSearch}>
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                  <circle cx="11" cy="11" r="8"></circle>
-                  <path d="m21 21-4.35-4.35"></path>
-                </svg>
-              </button>
-          </div>
+            <button
+              className="search-button"
+              onClick={handleSearch}
+              tabIndex={0}
+              onKeyDown={(e) => {
+                if (e.key === "Enter") handleSearch()
+              }}
+            >
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                <circle cx="11" cy="11" r="8"></circle>
+                <path d="m21 21-4.35-4.35"></path>
+              </svg>
+            </button>
+            </div>
 
-          {/* Location Dropdown */}
+            {/* Location Dropdown */}
           {activeSection === "location" && (
             <div className="location-dropdown">
               <div className="location-header">
