@@ -38,7 +38,7 @@ export default function AreasSection() {
 
   return (
     <section className="areas-section">
-      <h2 className="section-title">Areas of Our Homes</h2>
+      <h2 className="section-title">Explore Our Prime Locations</h2>
       <div className="areas-container">
         <div className="areas-wrapper">
           {/* Ensure 260px matches the width of an area-card + its margin/gap */}

@@ -1,8 +1,16 @@
 // app/property-details/components/BookingWidget.jsx
 "use client"
 import { renderIcon } from "../../utils/renderIcon"
+import { useNavigate } from "react-router-dom"
+import { useState } from "react"
 
-export default function BookingWidget({ pricePerNight, checkInDate, checkOutDate }) {
+export default function BookingWidget({ pricePerNight, checkInDate: initialCheckInDate, checkOutDate: initialCheckOutDate, propertyData }) {
+  const navigate = useNavigate()
+
+  const [checkInDate, setCheckInDate] = useState(initialCheckInDate || "")
+  const [checkOutDate, setCheckOutDate] = useState(initialCheckOutDate || "")
+  const [guests, setGuests] = useState(1)
+
   const calculateNights = (start, end) => {
     if (!start || !end) return 0
     const startDate = new Date(start)
@@ -27,8 +35,15 @@ export default function BookingWidget({ pricePerNight, checkInDate, checkOutDate
       alert("Please select check-in and check-out dates.")
       return
     }
-    alert(`Reserving for ${totalNights} nights from ${formattedCheckIn} to ${formattedCheckOut} for $${totalPrice}`)
-    // In a real app, this would trigger an API call
+    if (new Date(checkOutDate) <= new Date(checkInDate)) {
+      alert("Check-out date must be after check-in date.")
+      return
+    }
+    if (guests < 1) {
+      alert("Please select at least one guest.")
+      return
+    }
+    navigate("/request-to-book", { state: { propertyData, checkInDate, checkOutDate, pricePerNight, guests } })
   }
 
   return (
@@ -38,18 +53,38 @@ export default function BookingWidget({ pricePerNight, checkInDate, checkOutDate
       </div>
       <div className="booking-input-group">
         <div className="booking-input">
-          <span className="input-label">CHECK-IN</span>
-          <span className="input-value">{formattedCheckIn}</span>
+          <label className="input-label" htmlFor="checkin">CHECK-IN</label>
+          <input
+            id="checkin"
+            type="date"
+            className="input-value"
+            value={checkInDate}
+            onChange={(e) => setCheckInDate(e.target.value)}
+          />
         </div>
         <div className="booking-input">
-          <span className="input-label">CHECKOUT</span>
-          <span className="input-value">{formattedCheckOut}</span>
+          <label className="input-label" htmlFor="checkout">CHECKOUT</label>
+          <input
+            id="checkout"
+            type="date"
+            className="input-value"
+            value={checkOutDate}
+            onChange={(e) => setCheckOutDate(e.target.value)}
+            min={checkInDate}
+          />
         </div>
       </div>
       <div className="booking-input-with-icon">
         <div className="input-text">
-          <span className="input-label">GUESTS</span>
-          <span className="input-value">1 guest</span> {/* Hardcoded as per image */}
+          <label className="input-label" htmlFor="guests">GUESTS</label>
+          <input
+            id="guests"
+            type="number"
+            className="input-value"
+            value={guests}
+            onChange={(e) => setGuests(Math.max(1, parseInt(e.target.value) || 1))}
+            min="1"
+          />
         </div>
         {renderIcon("ChevronDown")}
       </div>

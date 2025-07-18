@@ -161,6 +161,7 @@ body {
 /* Hero Section */
 .hero {
   height: 100vh;
+  width: 100%;
   background-image: url("../../assets/header-image.jpg");
   background-size: cover;
   background-position: center;
@@ -206,7 +207,7 @@ body {
 /* Areas Section */
 .areas-section {
   padding: 4rem 2rem;
-  max-width: 1400px;
+  max-width: 1200px;
   margin: 0 auto;
 }
 
@@ -570,6 +571,7 @@ body {
 
 /* Agents Section */
 .agents-section {
+  max-width: 1200px;
   padding: 4rem 2rem;
   background: white;
 }
@@ -867,6 +869,7 @@ body {
 
 /* Reviews Section Updates */
 .reviews-section {
+  max-width: 1200px;
   padding: 4rem 2rem;
   background: #f9f9f9;
 }
@@ -1021,6 +1024,7 @@ body {
 
 /* List Property Section */
 .list-property-section {
+  width: 100%;
   padding: 4rem 2rem;
   background: #f9f9f9;
 }
@@ -1180,10 +1184,10 @@ body {
   background: #f8f9fa;
   color: #333;
   padding: 3rem 2rem 1rem;
+  width: 100%;
 }
 
 .footer-container {
-  max-width: 1200px;
   margin: 0 auto;
 }
 
