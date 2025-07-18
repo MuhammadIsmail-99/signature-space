@@ -2,6 +2,7 @@
 import React, { useState } from 'react';
 import { ArrowLeft } from 'lucide-react'; // Using Lucid-React for the arrow icon
 import { Link } from 'react-router-dom';
+import LoginSignupModal from "../register/signup";  
 
 
 // Consolidated CSS for all components
@@ -874,7 +875,7 @@ const appStyles = `
 function Header() {
   return (
     <header className="header">
-      <Link to="/payment-method">
+      <Link to="/property-details">
         <ArrowLeft size={24} className="back-arrow" />
       </Link>
       <h1>Request to book</h1>
@@ -883,15 +884,13 @@ function Header() {
 }
 
 // BookingSteps Component
-function BookingSteps({ currentStep }) {
+function BookingSteps({ currentStep, onContinue }) {
   return (
     <div className="booking-steps">
       <div className={`step-item ${currentStep === 1 ? 'active' : ''}`}>
         <div className="step-number">1.</div>
         <div className="step-title">Log in or sign up</div>
-          <Link to="/payment-method">
-            <button className="continue-button">Continue</button>
-          </Link>
+        <button className="continue-button" onClick={onContinue}>Continue</button>
       </div>
       <div className={`step-item ${currentStep === 2 ? 'active' : ''}`}>
         <div className="step-number">2.</div>
@@ -953,9 +952,16 @@ function BookingSummary() {
 
 function RequestToBookPage() {
   const [currentStep, setCurrentStep] = useState(1); // 1: Login, 2: Payment, 3: Review
+  const [isModalOpen, setIsModalOpen] = useState(false);
 
   const handleContinue = () => {
-    setCurrentStep(prevStep => prevStep + 1);
+    setIsModalOpen(true);
+  };
+
+  const handleModalClose = () => {
+    setIsModalOpen(false);
+    // Optionally advance step after modal closes
+    // setCurrentStep(prevStep => prevStep + 1);
   };
 
   return (
@@ -967,6 +973,7 @@ function RequestToBookPage() {
           <BookingSteps currentStep={currentStep} onContinue={handleContinue} />
           <BookingSummary />
         </div>
+        <LoginSignupModal isOpen={isModalOpen} onClose={handleModalClose} />
       </div>
     </>
   );
