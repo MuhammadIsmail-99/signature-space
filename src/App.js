@@ -5,7 +5,8 @@ import HomePage from "./home/page.jsx"
 import PropertyManagementPage from "./property-management/page.jsx"
 import AreasOfOurHomesPage from "./areas-of-our-homes/page.jsx"
 import PropertyDetailsPage from "./property-details/page.jsx"
-import RequestToBookPage from "./request-to-book/page.jsx"
+import RequestToBookPage from "./reservation/RequestToBookPage.jsx"
+import AddPaymentMethod from "./reservation/PaymentMethod.jsx"
 
 function App() {
   return (
@@ -18,6 +19,7 @@ function App() {
         <Route path="/property-details" element={<PropertyDetailsPage />} />
         <Route path="/property-management" element={<PropertyManagementPage />} />
         <Route path="/request-to-book" element={<RequestToBookPage />} />
+        <Route path="/payment-method" element={<AddPaymentMethod />} />
       </Routes>
     </div>
   )
