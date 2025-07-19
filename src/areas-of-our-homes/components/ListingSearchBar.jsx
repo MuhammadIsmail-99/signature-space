@@ -1,7 +1,7 @@
 "use client"
 
 import { useState } from "react"
-import "../styles/search-bar.css"
+import "../styles/searchBar.css"
 
 const destinations = [
   {

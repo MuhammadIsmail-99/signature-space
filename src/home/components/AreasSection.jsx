@@ -3,23 +3,25 @@
 
 import { useState } from "react"
 import { useNavigate } from "react-router-dom"
-import { areas } from "../../utils/dummyData" // Corrected import path
+import { areas } from "../../utils/dummyData"
 import { renderIcon } from "../utils"
+import { useScrollAnimation, useStaggeredAnimation } from "../../hooks/useScrollAnimation"
+import "../styles/AreasSection.css"
+import "../styles/animations.css"
 
 export default function AreasSection() {
   const [currentSlide, setCurrentSlide] = useState(0)
   const navigate = useNavigate()
 
+  // Animation hooks
+  const [titleRef, titleVisible] = useScrollAnimation({ delay: 0 })
+  const [sliderRef, sliderVisible] = useScrollAnimation({ threshold: 0.2 })
+  const [cardsRef, cardsVisible, getItemDelay] = useStaggeredAnimation(areas.length, {
+    staggerDelay: 150,
+  })
+
   const nextSlide = () => {
-    // Assuming each card takes up 260px, and we want to see a full card move at a time
-    // And assuming we show 3 cards at a time fully, with a fourth partially visible or as a buffer.
-    // The previous logic `areas.length - 4` implied that 4 cards are visible at once.
-    // Let's ensure we don't go past the end of the visible window.
-    // If you have a specific number of cards visible, adjust the '4' accordingly.
-    // For example, if 3 cards are visible, it would be areas.length - 3.
-    // Given the `transform: translateX(-${currentSlide * 260}px)` and `areas.length - 4`
-    // I'll assume 4 cards are intended to be visible.
-    const numVisibleCards = 4; // Adjust this if your layout shows a different number of cards
+    const numVisibleCards = 4
     if (currentSlide < areas.length - numVisibleCards) {
       setCurrentSlide(currentSlide + 1)
     }
@@ -32,22 +34,28 @@ export default function AreasSection() {
   }
 
   const handleViewProperties = (city) => {
-    // Navigates to the listing page, pre-filtering by the selected city
     navigate(`/listing?city=${encodeURIComponent(city)}`)
   }
 
   return (
     <section className="areas-section">
-      <h2 className="section-title">Explore Our Prime Locations</h2>
+      <h2 ref={titleRef} className={`section-title animate-title ${titleVisible ? "visible" : ""}`}>
+        Explore Our Prime Locations
+      </h2>
       <div className="areas-container">
-        <div className="areas-wrapper">
-          {/* Ensure 260px matches the width of an area-card + its margin/gap */}
-          <div className="areas-slider" style={{ transform: `translateX(-${currentSlide * 260}px)` }}>
-            {areas.map((area) => (
-              <div key={area.id} className="area-card" onClick={() => handleViewProperties(area.title)}>
-                {/* Use the image directly if it's a require, otherwise provide a fallback */}
+        <div ref={sliderRef} className={`areas-wrapper animate-slider ${sliderVisible ? "visible" : ""}`}>
+          <div ref={cardsRef} className="areas-slider" style={{ transform: `translateX(-${currentSlide * 260}px)` }}>
+            {areas.map((area, index) => (
+              <div
+                key={area.id}
+                className={`area-card animate-card ${cardsVisible ? "visible" : ""}`}
+                style={{
+                  transitionDelay: `${getItemDelay(index)}ms`,
+                }}
+                onClick={() => handleViewProperties(area.title)}
+              >
                 <img
-                  src={area.image ? area.image : "/path/to/placeholder.png"} // Use a proper placeholder if area.image is missing
+                  src={area.image ? area.image : "/placeholder.svg?height=120&width=120&query=city location"}
                   alt={area.title}
                   className="area-image"
                 />
@@ -58,12 +66,10 @@ export default function AreasSection() {
           </div>
         </div>
 
-        {/* Previous Button */}
         <button className="nav-button prev" onClick={prevSlide} disabled={currentSlide === 0}>
           {renderIcon("chevron-left", 20)}
         </button>
 
-        {/* Next Button */}
         <button className="nav-button next" onClick={nextSlide} disabled={currentSlide >= areas.length - 4}>
           {renderIcon("chevron-right", 20)}
         </button>

@@ -227,7 +227,7 @@
   margin: 12px 0;
 }
 
-.search-button {
+/* .search-button {
   background: #cba135;
   border: none;
   border-radius: 50%;
@@ -240,7 +240,7 @@
   cursor: pointer;
   transition: transform 0.1s ease;
   margin: 10px;
-}
+} */
 
 .search-button:hover {
   transform: scale(1.04);
@@ -1081,7 +1081,7 @@
 }
 
 .apply-filters-btn {
-  background: #cba135;
+  background: linear-gradient(135deg, #d97706, #f59e0b);
   color: white;
   border: none;
   border-radius: 24px;

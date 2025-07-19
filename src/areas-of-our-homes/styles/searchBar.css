@@ -87,7 +87,7 @@
     background-color: #dddddd;
     margin: 12px 0;
   }
-  
+/*   
   .search-button {
     background: #CBA135;
     border: none;
@@ -101,7 +101,7 @@
     cursor: pointer;
     transition: transform 0.1s ease;
     margin: 10px;
-  }
+  } */
   
   .search-button:hover {
     transform: scale(1.04);
@@ -663,6 +663,7 @@
   /* Updated styles to remove top margin and center align the search bar */
 .searchbar-bg {
   /* height: 100vh; */
+  margin-top: -30px;
   width: 100%;
   background-size: cover;
   background-position: center;

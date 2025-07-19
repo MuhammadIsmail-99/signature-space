@@ -2,15 +2,24 @@
 "use client"
 
 import { useState } from "react"
-import { reviews } from "../../utils/dummyData" // Corrected import path for reviews
+import { reviews } from "../../utils/dummyData"
 import { renderIcon } from "../utils"
+import { useScrollAnimation, useStaggeredAnimation } from "../../hooks/useScrollAnimation"
+import "../styles/ReviewsSection.css"
+import "../styles/animations.css"
 
 export default function ReviewsSection() {
   const [reviewsCurrentSlide, setReviewsCurrentSlide] = useState(0)
 
+  // Animation hooks
+  const [titleRef, titleVisible] = useScrollAnimation({ delay: 0 })
+  const [sliderRef, sliderVisible] = useScrollAnimation({ delay: 200 })
+  const [cardsRef, cardsVisible, getItemDelay] = useStaggeredAnimation(reviews.length, {
+    staggerDelay: 150,
+  })
+
   const nextReviewsSlide = () => {
-    // Assuming 2 review cards are visible at a time, based on the `reviews.length - 2` logic
-    const numVisibleReviews = 2; // Adjust this if your layout shows a different number of cards
+    const numVisibleReviews = 2
     if (reviewsCurrentSlide < reviews.length - numVisibleReviews) {
       setReviewsCurrentSlide(reviewsCurrentSlide + 1)
     }
@@ -26,30 +35,38 @@ export default function ReviewsSection() {
     <section className="reviews-section">
       <div className="reviews-container">
         <div className="reviews-header">
-          <div className="reviews-title-container">
+          <div ref={titleRef} className={`reviews-title-container animate-on-scroll ${titleVisible ? "visible" : ""}`}>
             {renderIcon("star", 24, "currentColor")}
-            <h2 className="reviews-title" style={{marginBottom:"0"}}>Popular Reviews</h2>
+            <h2 className="reviews-title" style={{ marginBottom: "0" }}>
+              Popular Reviews
+            </h2>
           </div>
         </div>
 
-        <div className="reviews-slider-container">
+        <div ref={sliderRef} className={`reviews-slider-container animate-slider ${sliderVisible ? "visible" : ""}`}>
           <div className="reviews-wrapper">
-            {/* Ensure 280px matches the width of a review-card + its margin/gap */}
-            <div className="reviews-slider" style={{ transform: `translateX(-${reviewsCurrentSlide * 280}px)` }}>
-              {reviews.map((review) => (
-                <div key={review.id} className="review-card">
+            <div
+              ref={cardsRef}
+              className="reviews-slider"
+              style={{ transform: `translateX(-${reviewsCurrentSlide * 280}px)` }}
+            >
+              {reviews.map((review, index) => (
+                <div
+                  key={review.id}
+                  className={`review-card animate-card ${cardsVisible ? "visible" : ""}`}
+                  style={{
+                    transitionDelay: `${getItemDelay(index)}ms`,
+                  }}
+                >
                   <div className="review-header">
-                    {/* Use the image directly if it's a require, otherwise provide a fallback */}
-                    <img src={review.image || "/placeholder.svg"} alt={review.name} className="reviewer-image" />
+                    <img
+                      src={review.image || "/placeholder.svg?height=50&width=50&query=reviewer profile"}
+                      alt={review.name}
+                      className="reviewer-image"
+                    />
                     <div className="reviewer-info">
                       <div className="reviewer-name-container">
                         <h4 className="reviewer-name">{review.name}</h4>
-                        {review.verified && (
-                          <div className="verified-badge">
-                            {renderIcon("verified", 12, "currentColor")}
-                            <span>Verified Buyer</span>
-                          </div>
-                        )}
                       </div>
                       <p className="review-date">{review.date}</p>
                     </div>
@@ -78,7 +95,7 @@ export default function ReviewsSection() {
           <button
             className="nav-button next reviews-next"
             onClick={nextReviewsSlide}
-            disabled={reviewsCurrentSlide >= reviews.length - 2} // Assuming 2 reviews visible
+            disabled={reviewsCurrentSlide >= reviews.length - 2}
           >
             {renderIcon("chevron-right", 20)}
           </button>

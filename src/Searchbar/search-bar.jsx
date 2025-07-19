@@ -335,7 +335,7 @@ export default function SearchBar() {
 
   return (
     <>
-      <div className="searchbar-bg"> {/* Added the background image class */}
+      <div className="searchbar-bg" style={{marginTop: "-30px"}}> {/* Added the background image class */}
         <div className="search-container">
           <div className="search-bar">
             {/* Location Section */}

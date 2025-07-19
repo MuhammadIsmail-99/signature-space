@@ -1,4 +1,3 @@
-// app/home/components/PropertyDetailsPage.jsx
 "use client"
 
 import { useState, useRef, useCallback, useEffect, useMemo } from "react"
@@ -10,7 +9,7 @@ import AboutStay from "./components/AboutStay"
 import BookingWidget from "./components/BookingWidget"
 import LocationSection from "./components/LocationSection"
 import ReviewsSection from "./components/ReviewsSection"
-import AgentCard from "./components/AgentCard"
+// import AgentCard from "./components/AgentCard"
 import AvailabilitySection from "./components/AvailabilitySection"
 import StillLookingCard from "./components/StillLookingCard"
 import { dummyProperties } from "../utils/dummyData" 
@@ -28,6 +27,7 @@ export default function PropertyDetailsPage() {
 
   const [checkInDate, setCheckInDate] = useState(null);
   const [checkOutDate, setCheckOutDate] = useState(null);
+  const [guests, setGuests] = useState(1);
 
   const handleDatesChange = useCallback((inDate, outDate) => {
     setCheckInDate(inDate);
@@ -95,10 +95,13 @@ export default function PropertyDetailsPage() {
             </div>
 
             <div id="availability-section" ref={availabilityRef} className="">
-              <AvailabilitySection
-                onDatesChange={handleDatesChange}
-                bookedDates={bookedDates} // <-- PASS THE BOOKED DATES HERE
-              />
+            <AvailabilitySection
+              checkInDate={checkInDate ? new Date(checkInDate) : null}
+              checkOutDate={checkOutDate ? new Date(checkOutDate) : null}
+              setCheckInDate={setCheckInDate}
+              setCheckOutDate={setCheckOutDate}
+              bookedDates={bookedDates} // <-- PASS THE BOOKED DATES HERE
+            />
             </div>
 
             <div id="cancellation-section" ref={cancellationRef} className="">
@@ -111,8 +114,14 @@ export default function PropertyDetailsPage() {
               pricePerNight={propertyData.price}
               checkInDate={checkInDate}
               checkOutDate={checkOutDate}
+              setCheckInDate={setCheckInDate}
+              setCheckOutDate={setCheckOutDate}
+              bookedDates={bookedDates}
+              propertyData={propertyData}
+              guests={guests}
+              setGuests={setGuests}
             />
-            <AgentCard agent={propertyData.agent} />
+            {/* <AgentCard agent={propertyData.agent} /> */}
           </div>
           <StillLookingCard />
         </div>

@@ -10,7 +10,7 @@ import AgentsSection from "./components/AgentsSection"
 import ReviewsSection from "./components/ReviewsSection"
 import NewsletterSection from "./components/NewsletterSection"
 import Footer from "./components/Footer"
-import "./styles/home.css"
+// import "./styles/home.css"
 
 import React, { useState, useRef } from "react";
 

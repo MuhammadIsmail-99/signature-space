@@ -8,7 +8,7 @@ export default function PartnersSection() {
           {partners.map((partner) => (
             <img
               key={partner.name}
-              src={partner.logo ? require(`../../assets/${partner.logo}`) : require("../../assets/placeholder.svg")}
+              src={partner.logo ? require(`../../assets/${partner.logo}`) : require("../../assets/logo.png")}
               alt={partner.name}
               width={100}
               height={40}

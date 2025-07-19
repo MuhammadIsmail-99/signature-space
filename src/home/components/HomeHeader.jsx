@@ -5,6 +5,7 @@ import { renderIcon } from "../utils"
 import logo from "../../assets/logo.png"
 import React, { useState } from "react";
 import LoginSignupModal from "../../register/signup";  
+import "../styles/HomeHeader.css"; // Import the CSS for HomeHeader
 
 export default function HomeHeader({ onSelectRentalTab }) {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);

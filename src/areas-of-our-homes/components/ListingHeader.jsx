@@ -2,6 +2,7 @@
 "use client"
 
 import { useState } from "react"
+import { Link } from "react-router-dom"
 import FilterPopup from "./FilterPopup" // Import the new FilterPopup component
 import ListingSearchBar from "./ListingSearchBar" // Import the new ListingSearchBar
 import "../styles/header.css" // Import the new header specific styles
@@ -65,7 +66,7 @@ const destinations = [
   {
     id: "town-square",
     name: "Town Square",
-    description: "Family community with parks",
+    description: "Community living with parks",
     icon: "trees",
   },
   {
@@ -156,22 +157,53 @@ export default function ListingHeader({ onApplyFilters, initialFilters }) {
       )}
 
       {/* Mobile Menu Overlay */}
-      {isMobileMenuOpen && (
-        <div className="mobile-menu-overlay" onClick={() => setIsMobileMenuOpen(false)}>
-          <div className="mobile-menu-content" onClick={(e) => e.stopPropagation()}>
-            <button className="close-mobile-menu" onClick={() => setIsMobileMenuOpen(false)}>
-              {renderIcon("close", 24)}
-            </button>
-            <nav className="mobile-nav-links">
-              <a href="#">Home</a>
-              <a href="#">Listings</a>
-              <a href="#">About Us</a>
-              <a href="#">Contact</a>
-              <a href="#">Sign In</a>
-            </nav>
-          </div>
+      <div className={`mobile-nav ${isMobileMenuOpen ? "active" : ""}`}>
+        <div className="mobile-nav-header">
+          <a href="#" className="logo">
+            <div className="logo-icon">
+              <img src={logoImg} alt="Logo" />
+            </div>
+          </a>
+          <button className="close-mobile-menu" onClick={() => setIsMobileMenuOpen(false)}>
+            {renderIcon("close", 24)}
+          </button>
         </div>
-      )}
+        <ul>
+          <li>
+            <a href="/" className="nav-link" onClick={() => setIsMobileMenuOpen(false)}>
+              Home
+            </a>
+          </li>
+          <li>
+            <Link to="/rentals/monthly" className="nav-link" onClick={() => setIsMobileMenuOpen(false)}>
+              Monthly Properties
+            </Link>
+          </li>
+          <li>
+            <Link to="/rentals/daily" className="nav-link" onClick={() => setIsMobileMenuOpen(false)}>
+              Daily Properties
+            </Link>
+          </li>
+          <li>
+            <a href="#" className="nav-link" onClick={() => setIsMobileMenuOpen(false)}>
+              List Property (Owner)
+            </a>
+          </li>
+          <li>
+            <a href="#" className="nav-link" onClick={() => setIsMobileMenuOpen(false)}>
+              Blog
+            </a>
+          </li>
+          <li>
+            <a
+              onClick={() => setIsMobileMenuOpen(false)}
+              className="nav-link mobile-login-link"
+            >
+              Log in
+            </a>
+          </li>
+        </ul>
+      </div>
     </header>
   )
 }

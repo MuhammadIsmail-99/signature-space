@@ -769,7 +769,7 @@ body {
 }
 
 .view-deal-btn-horizontal {
-  background: #cba135;
+  background: linear-gradient(135deg, #d97706, #f59e0b);
   color: white;
   border: none;
   border-radius: 16px;

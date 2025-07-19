@@ -34,15 +34,9 @@ const isDateBooked = (date, bookedDates) => {
 };
 
 
-export default function AvailabilitySection({ onDatesChange, bookedDates = [] }) { // Add bookedDates prop with default
+export default function AvailabilitySection({ checkInDate, checkOutDate, setCheckInDate, setCheckOutDate, bookedDates = [] }) { // Add bookedDates prop with default
   const [currentMonth, setCurrentMonth] = useState(new Date());
-  const [checkInDate, setCheckInDate] = useState(null);
-  const [checkOutDate, setCheckOutDate] = useState(null);
   const [isMobileView, setIsMobileView] = useState(false);
-
-  useEffect(() => {
-    onDatesChange(checkInDate, checkOutDate);
-  }, [checkInDate, checkOutDate, onDatesChange]);
 
   useEffect(() => {
     const handleResize = () => {

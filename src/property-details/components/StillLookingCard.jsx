@@ -12,7 +12,7 @@ export default function StillLookingCard() {
       {/* Option 2: A standard anchor tag for navigation (if a full page reload is acceptable) 
         This is typically what you'd use if not using a client-side router like React Router.
       */}
-      <a href="/listing" className="keep-searching-btn">
+      <a href="/listing" className="keep-searching-btn show-more-btn">
         Keep searching
       </a>
     </div>

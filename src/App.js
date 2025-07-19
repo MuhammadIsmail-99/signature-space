@@ -1,12 +1,23 @@
 "use client"
 
 import { Routes, Route } from "react-router-dom"
+import { useState } from "react"
 import HomePage from "./home/page.jsx"
 import PropertyManagementPage from "./property-management/page.jsx"
 import AreasOfOurHomesPage from "./areas-of-our-homes/page.jsx"
 import PropertyDetailsPage from "./property-details/page.jsx"
-import RequestToBookPage from "./reservation/RequestToBookPage.jsx"
-import AddPaymentMethod from "./reservation/PaymentMethod.jsx"
+import Reservation from "./reservation/page.jsx"
+import RentalsSection from "./home/components/RentalsSection.jsx"
+
+function RentalsWrapper({ initialTab }) {
+  const [activeRentalTab, setActiveRentalTab] = useState(initialTab)
+  return (
+    <RentalsSection
+      activeRentalTab={activeRentalTab}
+      setActiveRentalTab={setActiveRentalTab}
+    />
+  )
+}
 
 function App() {
   return (
@@ -18,8 +29,8 @@ function App() {
         <Route path="/listing" element={<AreasOfOurHomesPage />} />
         <Route path="/property-details" element={<PropertyDetailsPage />} />
         <Route path="/property-management" element={<PropertyManagementPage />} />
-        <Route path="/request-to-book" element={<RequestToBookPage />} />
-        <Route path="/payment-method" element={<AddPaymentMethod />} />
+        <Route path="/reservation" element={<Reservation />} />
+        <Route path="/rentals/monthly" element={<HomePage />} />
       </Routes>
     </div>
   )

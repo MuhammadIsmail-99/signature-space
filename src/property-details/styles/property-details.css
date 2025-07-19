@@ -1,7 +1,6 @@
 /* app/property-details/styles/property-details.css */
 
 .property-details-page {
-  padding-top: 80px; /* To account for fixed header */
   background-color: #f8f8f8;
   min-height: 100vh;
 }
@@ -420,124 +419,212 @@
 }
 
 /* Booking Widget */
-.booking-widget {
-  border: 1px solid #e0e0e0;
-  padding: 1.5rem;
-  text-align: center; /* Center content for the new design */
+/* Booking Widget Styles */
+.booking-widget-container {
+  background-color: #ffffff;
+  border-radius: 16px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+  padding: 24px;
+  border: 1px solid #e2e8f0;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  max-width: 380px; /* Constrain width for better appearance */
+  margin: 0 auto; /* Center the widget */
 }
 
-.booking-widget .price-summary {
+.price-summary {
   font-size: 1.8rem;
   font-weight: 700;
-  color: #333;
-  margin-bottom: 1.5rem;
+  color: #1a202c;
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
 }
 
-.booking-widget .price-summary span {
+.price-summary span {
   font-size: 1rem;
   font-weight: 400;
-  color: #666;
-  margin-left: 5px;
+  color: #64748b;
 }
 
 .booking-input-group {
-  /* display: grid;
-  grid-template-columns: 1fr 1fr; */
-  border: 1px solid #e0e0e0;
-  border-radius: 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 1px; /* Small gap to create a subtle separator */
+  border: 1px solid #cbd5e1;
+  border-radius: 10px;
+  overflow: hidden; 
   margin-bottom: 1rem;
-  overflow: hidden; /* Ensures inner borders are contained */
 }
 
-.booking-input-group .booking-input {
-  padding: 0.8rem;
-  border: none; /* Remove individual borders */
-  outline: none;
-  font-size: 0.95rem;
-  text-align: left;
-  color: #333;
+.booking-input {
+  display: flex;
+  flex-direction: column;
+  padding: 12px 16px;
+  background-color: #f8fafc;
+  transition: background-color 0.2s ease, border-color 0.2s ease;
 }
 
-.booking-input-group .booking-input:first-child {
-  border-right: 1px solid #e0e0e0;
+.booking-input:first-child {
+  border-right: 1px solid #cbd5e1; /* Separator for date inputs */
 }
 
-.booking-input-group .input-label {
-  display: block;
+.booking-input:focus-within {
+  background-color: #ffffff;
+  box-shadow: 0 0 0 2px rgba(245, 158, 11, 0.2);
+  border-color: #f59e0b;
+  z-index: 1; /* Bring focused input to front to avoid border overlap issues */
+}
+
+.input-label {
   font-size: 0.75rem;
-  color: #888;
+  font-weight: 700;
+  color: #4a5568;
   margin-bottom: 4px;
   text-transform: uppercase;
-  font-weight: 600;
+  letter-spacing: 0.05em;
 }
 
-.booking-input-group .input-value {
-  font-size: 0.95rem;
-  color: #333;
+.input-value {
+  border: none;
+  background: transparent;
+  font-size: 1rem;
+  color: #2d3748;
+  padding: 0;
+  outline: none;
+  width: 100%;
+}
+
+/* Style for date input placeholder/empty state */
+.input-value[type="date"]::-webkit-datetime-edit-text,
+.input-value[type="date"]::-webkit-datetime-edit-month-field,
+.input-value[type="date"]::-webkit-datetime-edit-day-field,
+.input-value[type="date"]::-webkit-datetime-edit-year-field {
+  color: #2d3748; /* Ensure text is visible */
+}
+
+.input-value[type="date"]::-webkit-inner-spin-button,
+.input-value[type="date"]::-webkit-calendar-picker-indicator {
+  opacity: 0; /* Hide default calendar icon */
+  width: 100%;
+  height: 100%;
+  cursor: pointer;
+  position: absolute;
+  top: 0;
+  left: 0;
 }
 
 .booking-input-with-icon {
   display: flex;
   align-items: center;
-  justify-content: space-between; /* Align text left, icon right */
-  gap: 0.75rem;
-  padding: 0.8rem;
-  border: 1px solid #e0e0e0;
-  border-radius: 8px;
-  font-size: 0.95rem;
-  color: #555;
-  margin-bottom: 1.5rem;
-  cursor: pointer;
-  text-align: left;
+  justify-content: space-between;
+  border: 1px solid #cbd5e1;
+  border-radius: 10px;
+  padding: 12px 16px;
+  background-color: #f8fafc;
+  transition: background-color 0.2s ease, border-color 0.2s ease;margin-bottom: 1rem;
+}
+
+.booking-input-with-icon:focus-within {
+  background-color: #ffffff;
+  box-shadow: 0 0 0 2px rgba(245, 158, 11, 0.2);
+  border-color: #f59e0b;
 }
 
 .booking-input-with-icon .input-text {
+  display: flex;
+  flex-direction: column;
   flex-grow: 1;
 }
 
-.booking-input-with-icon .input-label {
-  display: block;
-  font-size: 0.75rem;
-  color: #888;
-  margin-bottom: 4px;
-  text-transform: uppercase;
-  font-weight: 600;
-}
-
-.booking-input-with-icon .input-value {
-  font-size: 0.95rem;
-  color: #333;
-}
-
 .booking-input-with-icon svg {
-  color: #333;
+  width: 20px;
+  height: 20px;
+  color: #64748b;
+  flex-shrink: 0;
 }
 
 .reserve-btn {
-  background: #cba135;
+  background: linear-gradient(135deg, #f59e0b, #d97706);
   color: white;
+  padding: 16px 24px;
   border: none;
-  padding: 1rem;
-  border-radius: 8px;
-  font-weight: 600;
+  border-radius: 10px;
+  font-size: 1.1rem;
+  font-weight: 700;
   cursor: pointer;
-  width: 100%;
-  font-size: 1rem;
   transition: all 0.3s ease;
-  box-shadow: 0 4px 12px rgba(255, 56, 92, 0.3);
+  box-shadow: 0 8px 20px rgba(245, 158, 11, 0.3);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin-bottom: 1rem;
 }
 
 .reserve-btn:hover {
   transform: translateY(-2px);
-  box-shadow: 0 6px 16px #cba135;
-  background: #bb9022;
+  box-shadow: 0 12px 25px rgba(245, 158, 11, 0.4);
+  background: linear-gradient(135deg, #fbbf24, #f59e0b);
+}
+
+.reserve-btn:active {
+  transform: translateY(0);
+  box-shadow: 0 4px 10px rgba(245, 158, 11, 0.2);
+}
+
+.reserve-btn:focus {
+  outline: 3px solid rgba(245, 158, 11, 0.5);
+  outline-offset: 2px;
 }
 
 .charge-info {
-  font-size: 0.85rem;
-  color: #666;
-  margin-top: 1rem;
+  text-align: center;
+  font-size: 0.9rem;
+  color: #64748b;
+  margin-top: -10px; /* Adjust spacing */
 }
+
+/* Responsive adjustments */
+@media (max-width: 480px) {
+  .booking-widget-container {
+    padding: 20px;
+    gap: 15px;
+  }
+
+  .price-summary {
+    font-size: 1.6rem;
+  }
+
+  .price-summary span {
+    font-size: 0.9rem;
+  }
+
+  .booking-input-group {
+    grid-template-columns: 1fr; /* Stack inputs on very small screens */
+  }
+
+  .booking-input:first-child {
+    border-right: none;
+    border-bottom: 1px solid #cbd5e1; /* Add bottom border when stacked */
+  }
+
+  .reserve-btn {
+    padding: 14px 20px;
+    font-size: 1rem;
+  }
+
+  .charge-info {
+    font-size: 0.85rem;
+  }
+}
+
+/* Accessibility */
+.booking-widget-container:focus-within {
+  outline: 2px solid #f59e0b;
+  outline-offset: 4px;
+  border-radius: 18px;
+}
+
 
 /* Agent Card */
 .agent-card {

@@ -27,7 +27,7 @@ export default function PropertyManagementPage() {
     <div className="property-management-page">
       <HomeHeader />
       <HeroSection />
-      <PartnersSection />
+      {/* <PartnersSection /> */}
       <TrustedOperatorSection />
       <MaximizeEarningsSection />
       <OwnersPortalSection />
