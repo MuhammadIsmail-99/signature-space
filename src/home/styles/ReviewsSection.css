@@ -54,7 +54,7 @@
   font-size: clamp(2.5rem, 5vw, 3.5rem); /* Larger title */
   font-weight: 800; /* Bolder font */
   color: #1e293b;
-  background: linear-gradient(135deg, #d97706, #f59e0b, #fbbf24); /* More vibrant gradient */
+  background: #cba135; /* More vibrant gradient */
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
@@ -70,7 +70,7 @@
   transform: translateX(-50%);
   width: 100px; /* Wider underline */
   height: 5px; /* Thicker underline */
-  background: linear-gradient(135deg, #d97706, #f59e0b);
+  background: #cba135;
   border-radius: 3px;
   animation: underlineExpand 1s ease-out 0.5s both;
 }
@@ -253,8 +253,8 @@
 }
 
 .review-rating svg {
-  color: #f59e0b; /* Star color */
-  fill: #f59e0b; /* Ensure stars are filled */
+  color: #cba135; /* Star color */
+  fill: #cba135; /* Ensure stars are filled */
 }
 
 /* Review Text */
@@ -264,7 +264,7 @@
   line-height: 1.7; /* Improved line height for readability */
   flex-grow: 1;
   display: -webkit-box;
-  -webkit-line-clamp: 4; /* Limit to 4 lines */
+  /* -webkit-line-clamp: 4; Limit to 4 lines */
   -webkit-box-orient: vertical;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -291,7 +291,7 @@
 }
 
 .nav-button:hover:not(:disabled) {
-  background: linear-gradient(135deg, #d97706, #f59e0b);
+  background: #cba135;
   color: white;
   border-color: #d97706;
   transform: translateY(-50%) scale(1.15); /* More pronounced scale */

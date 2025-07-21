@@ -1,6 +1,6 @@
 /* Footer Section Styles */
 .footer {
-  background: linear-gradient(135deg, #111827, #1f2937); /* Dark gradient for better alignment */
+  background: #2c2c2c; /* Dark gradient for better alignment */
   color: #e2e8f0; /* Light text color */
   padding: 60px 20px 30px; /* Ample padding */
   font-family: "Inter", sans-serif; /* Consistent font */
@@ -51,7 +51,7 @@
 }
 
 .footer-link:hover {
-  color: #f59e0b; /* Orange on hover */
+  color: #a78c2a; /* Orange on hover */
   transform: translateX(5px); /* Subtle slide effect */
 }
 
@@ -77,10 +77,10 @@
 }
 
 .social-link:hover {
-  background: linear-gradient(135deg, #d97706, #f59e0b); /* Orange gradient on hover */
+  background: #cba135; /* Orange gradient on hover */
   color: white; /* White icon on hover */
   transform: translateY(-3px) scale(1.05); /* Lift and slight scale */
-  box-shadow: 0 5px 15px rgba(217, 119, 6, 0.3);
+  box-shadow: #a78c2a;
 }
 
 /* Footer Bottom (Copyright) */
@@ -181,7 +181,7 @@
   }
 
   .footer-link:hover {
-    color: #f59e0b;
+    color:#a78c2a;
   }
 
   .social-link {
@@ -191,7 +191,7 @@
   }
 
   .social-link:hover {
-    background: #f59e0b;
+    background: #a78c2a;
     color: #000;
   }
 

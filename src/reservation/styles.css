@@ -59,7 +59,7 @@ body {
 .radio-option input[type="radio"] {
   width: 20px;
   height: 20px;
-  accent-color: #d97706;
+  accent-color: #cba135;
 }
 
 .radio-option label {
@@ -96,8 +96,8 @@ body {
 
 .form-input:focus {
   outline: none;
-  border-color: #d97706;
-  box-shadow: 0 0 0 3px rgba(217, 119, 6, 0.1);
+  border-color: #cba135;
+  box-shadow: 0 0 0 3px rgba(167, 140, 42, 0.096);
 }
 
 .form-input::placeholder {
@@ -117,8 +117,8 @@ body {
 
 .form-select:focus {
   outline: none;
-  border-color: #d97706;
-  box-shadow: 0 0 0 3px rgba(217, 119, 6, 0.1);
+  border-color: #cba135;
+  box-shadow: 0 0 0 3px rgba(167, 140, 42, 0.096);
 }
 
 .helper-text {
@@ -138,7 +138,7 @@ body {
 .checkbox-group input[type="checkbox"] {
   width: 20px;
   height: 20px;
-  accent-color: #d97706;
+  accent-color: #cba135;
   margin-top: 2px;
 }
 
@@ -277,13 +277,13 @@ body {
 }
 
 .step.active {
-  background: #d97706;
+  background: #cba135;
   color: white;
   font-weight: 600;
 }
 
 .step.completed {
-  background: #d97706;
+  background: #cba135;
   color: white;
   font-weight: 600;
 }
@@ -334,7 +334,7 @@ body {
 }
 
 .payment-option:hover {
-  border-color: #d97706;
+  border-color: #cba135;
 }
 
 .payment-option-left {
@@ -346,7 +346,7 @@ body {
 .payment-option input[type="radio"] {
   width: 20px;
   height: 20px;
-  accent-color: #d97706;
+  accent-color: #cba135;
 }
 
 .payment-option label {
@@ -379,7 +379,7 @@ body {
 .cancellation-policy h3 {
   font-size: 16px;
   font-weight: 600;
-  color: #d97706;
+  color: #cba135;
   margin-bottom: 12px;
 }
 
@@ -391,7 +391,7 @@ body {
 }
 
 .link {
-  color: #d97706;
+  color: #cba135;
   text-decoration: underline;
 }
 
@@ -402,7 +402,7 @@ body {
 .primary-button {
   width: 100%;
   padding: 16px 24px;
-  background: #d97706;
+  background: #cba135;
   color: white;
   border: none;
   border-radius: 8px;
@@ -413,12 +413,12 @@ body {
 }
 
 .primary-button:hover {
-  background: #b45309;
+  background: #a78c2a;
 }
 
 .primary-button:focus {
   outline: none;
-  box-shadow: 0 0 0 3px rgba(217, 119, 6, 0.2);
+  box-shadow: 0 0 0 3px rgba(167, 140, 42, 0.2);
 }
 
 .security-info {
@@ -690,9 +690,9 @@ body {
   width: 100%;
   padding: 12px 16px;
   background: transparent;
-  border: 2px solid #d97706;
+  border: 2px solid #cba135;
   border-radius: 8px;
-  color: #d97706;
+  color: #cba135;
   font-weight: 500;
   font-size: 14px;
   cursor: pointer;
@@ -700,7 +700,7 @@ body {
 }
 
 .policy-button:hover {
-  background: #d97706;
+  background: #cba135;
   color: white;
 }
 

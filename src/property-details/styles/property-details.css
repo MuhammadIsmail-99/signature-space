@@ -472,7 +472,7 @@
 
 .booking-input:focus-within {
   background-color: #ffffff;
-  box-shadow: 0 0 0 2px rgba(245, 158, 11, 0.2);
+  box-shadow: 0 0 0 2px rgba(167, 140, 42, 0.096);
   border-color: #f59e0b;
   z-index: 1; /* Bring focused input to front to avoid border overlap issues */
 }
@@ -528,7 +528,7 @@
 
 .booking-input-with-icon:focus-within {
   background-color: #ffffff;
-  box-shadow: 0 0 0 2px rgba(245, 158, 11, 0.2);
+  box-shadow: 0 0 0 2px rgba(167, 140, 42, 0.096);
   border-color: #f59e0b;
 }
 
@@ -546,7 +546,7 @@
 }
 
 .reserve-btn {
-  background: linear-gradient(135deg, #f59e0b, #d97706);
+  background: #cba135;
   color: white;
   padding: 16px 24px;
   border: none;
@@ -563,13 +563,13 @@
 
 .reserve-btn:hover {
   transform: translateY(-2px);
-  box-shadow: 0 12px 25px rgba(245, 158, 11, 0.4);
-  background: linear-gradient(135deg, #fbbf24, #f59e0b);
+  box-shadow: 0 12px 25px rgba(167, 140, 42, 0.096);
+  background: #cba135;
 }
 
 .reserve-btn:active {
   transform: translateY(0);
-  box-shadow: 0 4px 10px rgba(245, 158, 11, 0.2);
+  box-shadow: 0 4px 10px rgba(167, 140, 42, 0.096);
 }
 
 .reserve-btn:focus {

@@ -84,7 +84,7 @@
   color: #1e293b;
   margin-bottom: 15px;
   line-height: 1.2;
-  background: linear-gradient(135deg, #d97706, #f59e0b, #fbbf24);
+  background: #cba135;
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
@@ -139,7 +139,7 @@
 
 .newsletter-btn {
   padding: 18px 35px;
-  background: linear-gradient(135deg, #d97706, #f59e0b, #fbbf24);
+  background: #cba135;
   color: white;
   border: none;
   border-radius: 50px;
@@ -172,12 +172,12 @@
 
 .newsletter-btn:hover {
   transform: translateY(-3px);
-  box-shadow: 0 12px 35px rgba(217, 119, 6, 0.4);
+  box-shadow: #a78c2a;
 }
 
 .newsletter-btn:active {
   transform: translateY(0);
-  box-shadow: 0 4px 15px rgba(217, 119, 6, 0.3);
+  box-shadow: 0 4px 15px rgba(167, 140, 42, 0.3);
 }
 
 /* Responsive Design */
@@ -274,7 +274,7 @@
 
 /* Focus States */
 .newsletter-input:focus {
-  outline: 3px solid rgba(217, 119, 6, 0.3);
+  outline: 3px solid rgba(167, 140, 42, 0.3);
   outline-offset: 2px;
 }
 

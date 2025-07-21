@@ -8,6 +8,8 @@ import AreasOfOurHomesPage from "./areas-of-our-homes/page.jsx"
 import PropertyDetailsPage from "./property-details/page.jsx"
 import Reservation from "./reservation/page.jsx"
 import RentalsSection from "./home/components/RentalsSection.jsx"
+import Blog from "./blog/page.jsx"
+
 
 function RentalsWrapper({ initialTab }) {
   const [activeRentalTab, setActiveRentalTab] = useState(initialTab)
@@ -31,6 +33,7 @@ function App() {
         <Route path="/property-management" element={<PropertyManagementPage />} />
         <Route path="/reservation" element={<Reservation />} />
         <Route path="/rentals/monthly" element={<HomePage />} />
+        <Route path="/blog" element={<Blog />} />
       </Routes>
     </div>
   )

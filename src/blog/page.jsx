@@ -1,161 +1,189 @@
 "use client"
 
-import { useState } from "react"
-import Image from "next/image"
-import Link from "next/link"
-import { blogPosts, blogCategories } from "./data"
-import { renderIcon } from "@/utils/renderIcon"
-import "@/app/blog/styles/blog.css"
+import { useState, useMemo, useEffect, useRef } from "react"
+import { blogPosts } from "./data.js"
+import BlogCard from "./BlogCard.jsx"
+import BlogModal from "./BlogModal.jsx"
+import NoResults from "./NoResults.jsx"
+import HomeHeader from "../home/components/HomeHeader.jsx"
+import Footer from "../home/components/Footer.jsx"
+import { Search, Calendar, Clock, User, ArrowRight } from "lucide-react"
+import "./styles.css"
 
-export default function BlogListingPage() {
+function Blog() {
+  const [selectedPost, setSelectedPost] = useState(null)
   const [searchTerm, setSearchTerm] = useState("")
-  const [activeCategory, setActiveCategory] = useState("All")
-  const [comments, setComments] = useState([
-    {
-      id: 1,
-      author: "John Doe",
-      date: "July 16, 2024",
-      content: "Great insights into the Dubai market! Very helpful for new investors.",
-    },
-    {
-      id: 2,
-      author: "Jane Smith",
-      date: "July 17, 2024",
-      content:
-        "I appreciate the detailed breakdown of family-friendly communities. This will definitely help my relocation plans.",
-    },
-  ])
-  const [newComment, setNewComment] = useState({ name: "", email: "", comment: "" })
+  const [visiblePosts, setVisiblePosts] = useState(6)
 
-  const handleSearch = (e) => {
-    e.preventDefault()
-    // Filtering is handled by the `filteredPosts` variable
-  }
+  const sectionHeaderRef = useRef(null)
+  const blogGridRef = useRef(null)
+  const loadMoreRef = useRef(null)
 
-  const handleCommentSubmit = (e) => {
-    e.preventDefault()
-    if (newComment.name && newComment.comment) {
-      setComments([
-        ...comments,
-        {
-          id: comments.length + 1,
-          author: newComment.name,
-          date: new Date().toLocaleDateString("en-US", { year: "numeric", month: "long", day: "numeric" }),
-          content: newComment.comment,
-        },
-      ])
-      setNewComment({ name: "", email: "", comment: "" })
+  // Get featured post (first post with featured flag)
+  const featuredPost = blogPosts.find((post) => post.featured) || blogPosts[0]
+  const otherPosts = blogPosts.filter((post) => post.id !== featuredPost.id)
+
+  // Filter posts based on search term
+  const filteredPosts = useMemo(() => {
+    if (!searchTerm.trim()) {
+      return otherPosts
     }
+
+    const searchLower = searchTerm.toLowerCase()
+    return otherPosts.filter(
+      (post) =>
+        post.title.toLowerCase().includes(searchLower) ||
+        post.excerpt.toLowerCase().includes(searchLower) ||
+        post.content.toLowerCase().includes(searchLower) ||
+        post.author.toLowerCase().includes(searchLower) ||
+        post.category.toLowerCase().includes(searchLower),
+    )
+  }, [searchTerm, otherPosts])
+
+  const displayedPosts = filteredPosts.slice(0, visiblePosts)
+
+  // Intersection Observer for scroll animations
+  useEffect(() => {
+    const observerOptions = {
+      threshold: 0.1,
+      rootMargin: "0px 0px -50px 0px",
+    }
+
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach((entry) => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add("animate")
+        }
+      })
+    }, observerOptions)
+
+    const elements = [sectionHeaderRef.current, blogGridRef.current, loadMoreRef.current].filter(Boolean)
+
+    elements.forEach((el) => observer.observe(el))
+
+    return () => {
+      elements.forEach((el) => observer.unobserve(el))
+    }
+  }, [])
+
+  const handlePostClick = (post) => {
+    setSelectedPost(post)
   }
 
-  const filteredPosts = blogPosts.filter((post) => {
-    const matchesSearch =
-      post.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      post.excerpt.toLowerCase().includes(searchTerm.toLowerCase())
-    const matchesCategory = activeCategory === "All" || post.categories.includes(activeCategory)
-    return matchesSearch && matchesCategory
-  })
+  const handleCloseModal = () => {
+    setSelectedPost(null)
+  }
+
+  const handleSearchChange = (e) => {
+    setSearchTerm(e.target.value)
+    setVisiblePosts(6) // Reset visible posts when searching
+  }
+
+  const handleClearSearch = () => {
+    setSearchTerm("")
+    setVisiblePosts(6)
+  }
+
+  const handleLoadMore = () => {
+    setVisiblePosts((prev) => prev + 6)
+  }
 
   return (
-    <div className="blog-page">
-      {/* Blog Header/Hero Section */}
-      <header className="blog-hero">
-        <div className="blog-hero-content">
-          <h1>Our Real Estate Insights</h1>
-          <p>Stay informed with the latest trends, expert advice, and local market updates from Signature Space.</p>
-          <form onSubmit={handleSearch} className="blog-search-bar">
-            <input
-              type="text"
-              placeholder="Search for articles..."
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-            />
-            <button type="submit">
-              {renderIcon("Search", { className: "icon" })}
-              Search
-            </button>
-          </form>
-        </div>
-      </header>
+    <div className="App">
+      <HomeHeader />
+      {/* Featured Post Section */}
+      <section className="featured-section">
+        <div className="container">
+          <div className="featured-container">
+            <div className="featured-content">
+              <div className="featured-badge">Featured Article</div>
+              <h1 className="featured-title">{featuredPost.title}</h1>
+              <p className="featured-excerpt">{featuredPost.excerpt}</p>
 
-      <div className="blog-container">
-        {/* Category Filters */}
-        <div className="blog-categories">
-          {blogCategories.map((category) => (
-            <button
-              key={category}
-              className={`blog-category-button ${activeCategory === category ? "active" : ""}`}
-              onClick={() => setActiveCategory(category)}
-            >
-              {category}
-            </button>
-          ))}
-        </div>
+              <div className="featured-meta">
+                <div className="featured-meta-item">
+                  <User size={16} />
+                  <span>{featuredPost.author}</span>
+                </div>
+                <div className="featured-meta-item">
+                  <Calendar size={16} />
+                  <span>
+                    {new Date(featuredPost.date).toLocaleDateString("en-US", {
+                      year: "numeric",
+                      month: "long",
+                      day: "numeric",
+                    })}
+                  </span>
+                </div>
+                <div className="featured-meta-item">
+                  <Clock size={16} />
+                  <span>{featuredPost.readTime}</span>
+                </div>
+              </div>
 
-        {/* Blog Post Listing */}
-        <div className="blog-post-grid">
+              <a
+                href="#"
+                className="featured-cta"
+                onClick={(e) => {
+                  e.preventDefault()
+                  handlePostClick(featuredPost)
+                }}
+              >
+                Read Full Article <ArrowRight size={18} />
+              </a>
+            </div>
+
+            <div className="featured-image-container">
+              <img src={featuredPost.image || "/placeholder.svg"} alt={featuredPost.title} className="featured-image" />
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Latest Stories Section */}
+      <section className="latest-section">
+        <div className="container">
+          <div className="section-header" ref={sectionHeaderRef}>
+            <h2 className="section-title">Latest stories</h2>
+            <div className="search-container">
+              <Search className="search-icon" size={20} />
+              <input
+                type="text"
+                className="search-input"
+                placeholder="What are you looking for?"
+                value={searchTerm}
+                onChange={handleSearchChange}
+              />
+            </div>
+          </div>
+
           {filteredPosts.length > 0 ? (
-            filteredPosts.map((post) => {
-              const formattedDate = new Date(post.publishDate).toLocaleDateString("en-US", {
-                year: "numeric",
-                month: "long",
-                day: "numeric",
-              })
-              return (
-                <Link href={`/blog/${post.slug}`} key={post.slug} className="blog-post-card">
-                  <Image
-                    src={post.featuredImage || "/placeholder.svg"}
-                    alt={post.title}
-                    width={400}
-                    height={200}
-                    className="blog-post-card-image"
-                  />
-                  <div className="blog-post-card-content">
-                    <div className="blog-post-card-categories">
-                      {post.categories.map((category) => (
-                        <span key={category} className="blog-post-card-category">
-                          {category}
-                        </span>
-                      ))}
-                    </div>
-                    <h2>{post.title}</h2>
-                    <p>{post.excerpt}</p>
-                    <div className="blog-post-card-meta">
-                      <div className="blog-post-card-author">
-                        <Image
-                          src={post.author.avatar || "/placeholder.svg"}
-                          alt={post.author.name}
-                          width={30}
-                          height={30}
-                          className="blog-post-card-author-img"
-                        />
-                        <span>{post.author.name}</span>
-                      </div>
-                      <div className="blog-post-card-read-time">
-                        {renderIcon("Clock", { width: 16, height: 16 })}
-                        <span>{post.readTime}</span>
-                      </div>
-                      <div className="blog-post-card-date">
-                        {renderIcon("Calendar", { width: 16, height: 16 })}
-                        <span>{formattedDate}</span>
-                      </div>
-                    </div>
-                  </div>
-                </Link>
-              )
-            })
+            <>
+              <div className="blog-grid" ref={blogGridRef}>
+                {displayedPosts.map((post) => (
+                  <BlogCard key={post.id} post={post} onClick={handlePostClick} />
+                ))}
+              </div>
+
+              {displayedPosts.length < filteredPosts.length && (
+                <div className="load-more-section" ref={loadMoreRef}>
+                  <button className="load-more-btn" onClick={handleLoadMore}>
+                    Load more
+                  </button>
+                </div>
+              )}
+            </>
           ) : (
-            <p style={{ textAlign: "center", gridColumn: "1 / -1", fontSize: "1.2em", color: "#666" }}>
-              No posts found matching your criteria.
-            </p>
+            <NoResults searchTerm={searchTerm} onClearSearch={handleClearSearch} />
           )}
         </div>
-      </div>
+      </section>
 
-      {/* Blog Footer */}
-      <footer className="blog-footer">
-        <p>&copy; {new Date().getFullYear()} Signature Space. All rights reserved.</p>
-      </footer>
+      {selectedPost && <BlogModal post={selectedPost} onClose={handleCloseModal} />}
+      <Footer />
+
     </div>
   )
 }
+
+export default Blog

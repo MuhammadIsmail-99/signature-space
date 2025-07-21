@@ -1,11 +1,4 @@
-body {
-  font-family: 'Inter', sans-serif;
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
-}
-
-.modal-overlay-full {
+.popup-overlay {
   position: fixed;
   top: 0;
   left: 0;
@@ -13,256 +6,278 @@ body {
   bottom: 0;
   background-color: rgba(0, 0, 0, 0.5);
   display: flex;
-  align-items: center;
   justify-content: center;
+  align-items: center;
   z-index: 1000;
-  padding: 1rem;
 }
 
-.modal-container {
-  background-color: #ffffff;
+.popup-content {
+  background-color: white;
   border-radius: 12px;
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
   width: 100%;
   max-width: 560px;
-  /* Adjusted max-width for the modal */
-  overflow: hidden;
+  max-height: 90vh;
+  overflow-y: auto;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
   display: flex;
   flex-direction: column;
 }
 
-.modal-header {
-  padding: 16px 24px;
-  border-bottom: 1px solid #e0e0e0;
+.popup-header {
   display: flex;
   align-items: center;
-  justify-content: center;
-  position: relative;
+  padding: 16px 24px;
+  border-bottom: 1px solid #e0e0e0;
+  position: sticky;
+  top: 0;
+  background-color: white;
+  z-index: 10;
 }
 
-.modal-title {
-  font-size: 1.125rem;
-  /* 18px */
-  font-weight: 600;
-  color: #333333;
-  text-align: center;
-  flex-grow: 1;
-  /* Allows title to take available space */
-}
-
-.modal-close-button {
+.popup-back-button {
   background: none;
   border: none;
   cursor: pointer;
   padding: 8px;
   border-radius: 50%;
-  position: absolute;
-  left: 16px;
-  top: 50%;
-  transform: translateY(-50%);
   display: flex;
   align-items: center;
   justify-content: center;
+  transition: background-color 0.2s;
+  position: absolute; /* Position relative to header */
+  left: 16px;
 }
 
-.modal-close-button:hover {
+.popup-back-button:hover {
   background-color: #f0f0f0;
 }
 
-.modal-close-button svg {
-  width: 20px;
-  height: 20px;
-  color: #555555;
+.popup-close-button {
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 8px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background-color 0.2s;
 }
 
-.modal-body {
+.popup-close-button:hover {
+  background-color: #f0f0f0;
+}
+
+.popup-title {
+  flex-grow: 1;
+  text-align: center;
+  font-size: 16px;
+  font-weight: 600;
+  margin-left: 0; /* Remove negative margin */
+}
+
+.popup-body {
   padding: 24px;
   display: flex;
   flex-direction: column;
-  gap: 16px;
+  gap: 20px;
+}
+
+.welcome-heading {
+  font-size: 22px;
+  font-weight: 600;
+  margin-bottom: 16px;
 }
 
 .input-group {
-  margin-bottom: 16px;
-}
-
-.country-phone-input {
-  display: flex;
-  border: 1px solid #cccccc;
+  border: 1px solid #b0b0b0;
   border-radius: 8px;
   overflow: hidden;
-  margin-bottom: 8px;
 }
 
-.country-select {
-  flex-shrink: 0;
-  padding: 12px 16px;
+.input-field {
+  width: 100%;
+  padding: 12px;
   border: none;
-  border-right: 1px solid #e0e0e0;
-  font-size: 1rem;
-  background-color: #f9f9f9;
   outline: none;
-  cursor: pointer;
-  border-top-left-radius: 8px;
-  border-bottom-left-radius: 8px;
+  font-size: 16px;
 }
 
-.phone-input {
+.input-field::placeholder {
+  color: #717171;
+}
+
+.input-field:focus {
+  border-color: black;
+}
+
+.input-label {
+  font-size: 12px;
+  color: #717171;
+  padding: 8px 12px 0;
+}
+
+.country-code-input {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 1px solid #e0e0e0;
+}
+
+.country-code-input .input-field {
   flex-grow: 1;
-  padding: 12px 16px;
-  border: none;
-  font-size: 1rem;
-  outline: none;
-  border-top-right-radius: 8px;
-  border-bottom-right-radius: 8px;
 }
 
-.error-message {
-  color: #e53e3e;
-  /* Red-500 */
-  font-size: 0.875rem;
-  /* text-sm */
-  margin-top: 4px;
+.country-code-input .arrow-icon {
+  margin-right: 12px;
+  color: #717171;
+}
+
+.sms-code-input-container {
+  display: flex;
+  justify-content: space-between;
+  gap: 8px;
+  border: 1px solid #b0b0b0;
+  border-radius: 8px;
+  padding: 12px;
+}
+
+.sms-code-input {
+  width: 40px; /* Adjust as needed for dash spacing */
+  height: 40px;
+  text-align: center;
+  font-size: 24px;
+  font-weight: 600;
+  border: none;
+  outline: none;
+  background: transparent;
+  color: #222222;
+}
+
+.sms-code-input:focus {
+  border-bottom: 2px solid black; /* Visual cue on focus */
+}
+
+.sms-code-input::placeholder {
+  color: #b0b0b0;
 }
 
 .privacy-text {
-  font-size: 0.875rem;
-  color: #555555;
-  margin-top: -8px;
-  /* Adjust margin to be closer to input */
-  margin-bottom: 16px;
+  font-size: 12px;
+  color: #717171;
+  line-height: 1.4;
 }
 
-.privacy-text a {
-  color: #007bff;
-  text-decoration: none;
-}
-
-.privacy-text a:hover {
+.privacy-link {
+  color: #222222;
+  font-weight: 600;
   text-decoration: underline;
+  cursor: pointer;
 }
 
 .continue-button {
   width: 100%;
-  padding: 14px 20px;
-  background-color: #ff385c;
-  /* Airbnb red */
-  color: #ffffff;
+  padding: 16px;
   border: none;
   border-radius: 8px;
-  font-size: 1.125rem;
+  font-size: 16px;
   font-weight: 600;
+  color: white;
+  background: #cba135;
   cursor: pointer;
-  transition: background-color 0.2s ease;
+  transition: opacity 0.2s;
 }
 
 .continue-button:hover {
-  background-color: #e00040;
+  opacity: 0.9;
 }
 
-.divider {
+.continue-button:disabled {
+  background: #e0e0e0;
+  color: #717171;
+  cursor: not-allowed;
+  opacity: 1; /* Override hover opacity */
+}
+
+.or-separator {
   display: flex;
   align-items: center;
   text-align: center;
-  color: #777777;
-  font-size: 0.875rem;
-  margin: 20px 0;
+  color: #717171;
+  font-size: 12px;
+  margin: 10px 0;
 }
 
-.divider::before,
-.divider::after {
-  content: '';
+.or-separator::before,
+.or-separator::after {
+  content: "";
   flex: 1;
   border-bottom: 1px solid #e0e0e0;
 }
 
-.divider:not(:empty)::before {
-  margin-right: .5em;
+.or-separator:not(:empty)::before {
+  margin-right: 10px;
 }
 
-.divider:not(:empty)::after {
-  margin-left: .5em;
-}
-
-.social-buttons-grid {
-  display: grid;
-  grid-template-columns: 1fr;
-  /* Stack on small screens */
-  gap: 12px;
-}
-
-@media (min-width: 480px) {
-
-  /* Adjust for slightly larger phones */
-  .social-buttons-grid {
-    grid-template-columns: repeat(2, 1fr);
-    /* Two columns on wider small screens */
-  }
-}
-
-@media (min-width: 768px) {
-
-  /* md breakpoint */
-  .social-buttons-grid {
-    grid-template-columns: repeat(3, 1fr);
-    /* Three columns on larger screens */
-  }
+.or-separator:not(:empty)::after {
+  margin-left: 10px;
 }
 
 .social-button {
   width: 100%;
-  padding: 12px 16px;
-  border: 1px solid #cccccc;
+  padding: 14px;
+  border: 1px solid #b0b0b0;
   border-radius: 8px;
-  background-color: #ffffff;
+  background-color: white;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 1rem;
+  gap: 12px;
+  font-size: 16px;
   font-weight: 500;
+  color: #222222;
   cursor: pointer;
-  transition: background-color 0.2s ease, border-color 0.2s ease;
-  gap: 8px;
+  transition: background-color 0.2s;
 }
 
 .social-button:hover {
-  background-color: #f0f0f0;
-  border-color: #999999;
+  background-color: #f7f7f7;
 }
 
-.social-button.apple {
-  background-color: #000000;
-  color: #ffffff;
+.social-button img {
+  width: 20px;
+  height: 20px;
 }
 
-.social-button.apple:hover {
-  background-color: #333333;
+.social-button .lucide-icon {
+  width: 20px;
+  height: 20px;
 }
 
-.social-icon {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.email-continue-button {
-  width: 100%;
-  padding: 12px 16px;
-  border: 1px solid #cccccc;
-  border-radius: 8px;
-  background-color: #ffffff;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 1rem;
-  font-weight: 500;
+.choose-option-link {
+  background-color: white;
+  border: none;
+  font-size: 14px;
+  font-weight: 600;
+  color: #222222;
+  text-decoration: underline;
   cursor: pointer;
-  transition: background-color 0.2s ease, border-color 0.2s ease;
-  gap: 8px;
-  margin-top: 12px;
+  margin-top: 10px;
 }
 
-.email-continue-button:hover {
-  background-color: #f0f0f0;
-  border-color: #999999;
+@media (max-width: 600px) {
+  .popup-content {
+    margin: 0;
+    border-radius: 0;
+    height: 100vh;
+    max-height: 100vh;
+  }
+
+  .popup-body {
+    padding: 16px;
+  }
+
+  .welcome-heading {
+    font-size: 20px;
+  }
 }

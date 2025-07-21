@@ -68,7 +68,7 @@ export default function HomeHeader({ onSelectRentalTab }) {
               </a>
             </li>
             <li>
-              <a href="#" className="nav-link">
+              <a href="/blog" className="nav-link">
                 Blog
               </a>
             </li>

@@ -157,16 +157,24 @@ function LeftCard({ data, onNext, onStepClick }) {
     </div>
   )
 
-  const renderConfirmation = () => (
-    <div className="confirmation-content">
-      <div className="confirmation-icon">
-        <CheckCircle size={80} className="success-icon" />
+  const renderConfirmation = () => {
+    const handleGoHome = () => {
+      window.location.href = "/";
+    };
+
+    return (
+      <div className="confirmation-content">
+        <div className="confirmation-icon">
+          <CheckCircle size={80} className="success-icon" />
+        </div>
+        <h1>Booking Confirmed!</h1>
+        <p>Your booking has been successfully completed. A confirmation email has been sent.</p>
+        <button className="primary-button" onClick={handleGoHome}>
+          Go to Home
+        </button>
       </div>
-      <h1>Booking Confirmed!</h1>
-      <p>Your booking has been successfully completed. A confirmation email has been sent.</p>
-      <button className="primary-button">Go to Home</button>
-    </div>
-  )
+    );
+  }
 
   const renderPersonalDetails = () => (
     <div className="personal-details-content">

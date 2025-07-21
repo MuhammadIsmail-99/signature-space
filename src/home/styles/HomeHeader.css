@@ -67,11 +67,11 @@
 }
 
 .nav-link:hover {
-  color: #d97706;
+  color: #a78c2a;
 }
 
 .nav-link.active {
-  color: #d97706;
+  color: #a78c2a;
 }
 
 .button-link {
@@ -89,7 +89,7 @@
 .profile-icon {
   width: 40px;
   height: 40px;
-  background: linear-gradient(135deg, #d97706, #f59e0b);
+  background: #cba135;
   border-radius: 50%;
   display: flex;
   align-items: center;
@@ -101,7 +101,7 @@
 
 .profile-icon:hover {
   transform: translateY(-1px);
-  box-shadow: 0 4px 12px rgba(217, 119, 6, 0.3);
+  box-shadow: #a78c2a;
 }
 
 /* Hamburger menu */
@@ -122,7 +122,7 @@
 }
 
 .hamburger:hover span {
-  background: #d97706;
+  background: #a78c2a;
 }
 
 /* Mobile navigation */
@@ -163,7 +163,7 @@
 
 .close-mobile-menu:hover {
   background: #f3f4f6;
-  color: #d97706;
+  color:#a78c2a;
 }
 
 .mobile-nav ul {
@@ -190,7 +190,7 @@
 
 .mobile-nav .nav-link:hover {
   background: #f9fafb;
-  color: #d97706;
+  color: #a78c2a;
 }
 
 .mobile-login-link {
@@ -308,7 +308,7 @@
   }
 
   .nav-link:hover {
-    color: #d97706;
+    color: #cba135 ;
     text-decoration: underline;
   }
 }

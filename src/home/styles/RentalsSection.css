@@ -33,7 +33,7 @@
   font-weight: 700;
   color: #1e293b;
   margin-bottom: 3rem;
-  background: linear-gradient(135deg, #d97706, #f59e0b);
+  background: #cba135;
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
@@ -49,7 +49,7 @@
   transform: translateX(-50%);
   width: 80px;
   height: 4px;
-  background: linear-gradient(135deg, #d97706, #f59e0b);
+  background: #cba135;
   border-radius: 2px;
   animation: underlineExpand 1s ease-out 0.5s both;
 }
@@ -115,7 +115,7 @@
   left: -100%;
   width: 100%;
   height: 100%;
-  background: linear-gradient(135deg, #d97706, #f59e0b);
+  background: #cba135;
   transition: left 0.3s ease;
   z-index: -1;
 }
@@ -128,9 +128,9 @@
 .rental-tab:hover,
 .rental-tab.active {
   color: white;
-  border-color: #d97706;
+  border-color: #a78c2a;
   transform: translateY(-2px);
-  box-shadow: 0 8px 25px rgba(217, 119, 6, 0.3);
+  box-shadow: 0 8px 25px rgba(167, 140, 42, 0.3);
 }
 
 /* Rentals Grid */
@@ -172,7 +172,7 @@
   left: 0;
   right: 0;
   bottom: 0;
-  background: linear-gradient(135deg, rgba(217, 119, 6, 0.05) 0%, rgba(245, 158, 11, 0.05) 100%);
+  background: rgba(167, 140, 42, 0.096);
   opacity: 0;
   transition: opacity 0.3s ease;
   z-index: 1;
@@ -186,7 +186,7 @@
 .rental-card:hover {
   transform: translateY(-8px);
   box-shadow: 0 20px 40px rgba(0, 0, 0, 0.12);
-  border-color: rgba(217, 119, 6, 0.1);
+  border-color: rgba(167, 140, 42, 0.3);
 }
 
 @keyframes cardSlideIn {
@@ -254,10 +254,10 @@
 }
 
 .image-nav-btn:hover {
-  background: linear-gradient(135deg, #d97706, #f59e0b);
+  background: #cba135;
   color: white;
   transform: translateY(-50%) scale(1.1);
-  box-shadow: 0 4px 15px rgba(217, 119, 6, 0.3);
+  box-shadow: 0 4px 15px rgba(167, 140, 42, 0.3);
 }
 
 .image-nav-btn.prev {
@@ -297,7 +297,7 @@
 }
 
 .image-dot.active {
-  background: linear-gradient(135deg, #d97706, #f59e0b);
+  background: #cba135;
   transform: scale(1.2);
 }
 
@@ -318,7 +318,7 @@
   font-weight: 700;
   color: #1e293b;
   margin-bottom: 8px;
-  background: linear-gradient(135deg, #d97706, #f59e0b);
+  background: #cba135;
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
@@ -342,7 +342,7 @@
 }
 
 .rental-location svg {
-  color: #d97706;
+  color: #cba135;
 }
 
 /* Rental Footer */
@@ -363,12 +363,12 @@
 }
 
 .rating svg {
-  color: #f59e0b;
+  color: #cba135;
 }
 
 /* View Deal Button */
 .view-deal-btn {
-  background: linear-gradient(135deg, #d97706, #f59e0b) !important;
+  background: #cba135 !important;
   color: white;
   border: none;
   border-radius: 12px;
@@ -388,7 +388,7 @@
   left: -100%;
   width: 100%;
   height: 100%;
-  background: linear-gradient(135deg, #b45309, #d97706);
+  background: #cba135;
   transition: left 0.3s ease;
   z-index: -1;
 }
@@ -399,7 +399,7 @@
 
 .view-deal-btn:hover {
   transform: translateY(-2px);
-  box-shadow: 0 8px 20px rgba(217, 119, 6, 0.3);
+  box-shadow: 0 8px 20px rgba(167, 140, 42, 0.3);
 }
 
 .view-deal-btn:active {
@@ -409,9 +409,9 @@
 /* Show More Button */
 .show-more-btn {
   background: none !important;
-  border: 2px solid #d97706 !important;
+  border: 2px solid #cba135 !important;
   border-radius: 50px !important;
-  color: #d97706 !important;
+  color: #cba135 !important;
   font-weight: 600 !important;
   cursor: pointer !important;
   margin-top: 1rem !important;
@@ -430,7 +430,7 @@
   left: -100%;
   width: 100%;
   height: 100%;
-  background: linear-gradient(135deg, #d97706, #f59e0b);
+  background: #cba135;
   transition: left 0.3s ease;
   z-index: -1;
 }
@@ -442,7 +442,7 @@
 .show-more-btn:hover {
   color: white !important;
   transform: translateY(-2px);
-  box-shadow: 0 8px 25px rgba(217, 119, 6, 0.3);
+  box-shadow: #a78c2a;
 }
 
 .show-more-btn:active {
@@ -614,7 +614,7 @@
 .view-deal-btn:focus,
 .show-more-btn:focus,
 .image-dot:focus {
-  outline: 2px solid #d97706;
+  outline: 2px solid #cba135;
   outline-offset: 2px;
 }
 
