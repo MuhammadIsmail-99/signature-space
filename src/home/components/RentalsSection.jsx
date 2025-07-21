@@ -14,6 +14,7 @@ const PROPERTIES_PER_LOAD = 8
 export default function RentalsSection({ activeRentalTab, setActiveRentalTab }) {
   const [rentalImageIndexes, setRentalImageIndexes] = useState({})
   const [visiblePropertyCount, setVisiblePropertyCount] = useState(PROPERTIES_PER_LOAD)
+  const [favoriteRentals, setFavoriteRentals] = useState({})
   const navigate = useNavigate()
 
   // Animation hooks
@@ -62,6 +63,13 @@ export default function RentalsSection({ activeRentalTab, setActiveRentalTab }) 
     return `From $${price}`
   }
 
+  const toggleFavorite = (rentalId) => {
+    setFavoriteRentals((prev) => ({
+      ...prev,
+      [rentalId]: !prev[rentalId],
+    }))
+  }
+
   const handleShowMore = () => {
     setVisiblePropertyCount((prevCount) => prevCount + PROPERTIES_PER_LOAD)
   }
@@ -80,7 +88,6 @@ export default function RentalsSection({ activeRentalTab, setActiveRentalTab }) 
           <button
             className={`rental-tab ${activeRentalTab === "daily" ? "active" : ""}`}
             onClick={() => {
-              // setActiveRentalTab("daily") will update the state
               setActiveRentalTab("daily")
               setVisiblePropertyCount(PROPERTIES_PER_LOAD)
             }}
@@ -90,7 +97,6 @@ export default function RentalsSection({ activeRentalTab, setActiveRentalTab }) 
           <button
             className={`rental-tab ${activeRentalTab === "monthly" ? "active" : ""}`}
             onClick={() => {
-              // setActiveRentalTab("monthly") will update the state
               setActiveRentalTab("monthly")
               setVisiblePropertyCount(PROPERTIES_PER_LOAD)
             }}
@@ -111,7 +117,7 @@ export default function RentalsSection({ activeRentalTab, setActiveRentalTab }) 
                     transitionDelay: `${getItemDelay(index)}ms`,
                   }}
                 >
-                  <div className="rental-image-container">
+                  <div className="rental-image-container" style={{ position: "relative" }}>
                     <div className="rental-images" style={{ transform: `translateX(-${currentImageIndex * 100}%)` }}>
                       {rental.images.map((image, index) => (
                         <img
@@ -122,30 +128,26 @@ export default function RentalsSection({ activeRentalTab, setActiveRentalTab }) 
                         />
                       ))}
                     </div>
-
-                    {rental.images.length > 1 && currentImageIndex > 0 && (
-                      <button className="image-nav-btn prev" onClick={() => handleImageNavigation(rental.id, "prev")}>
-                        <ChevronLeft size={16} />
-                      </button>
-                    )}
-
-                    {rental.images.length > 1 && currentImageIndex < rental.images.length - 1 && (
-                      <button className="image-nav-btn next" onClick={() => handleImageNavigation(rental.id, "next")}>
-                        <ChevronRight size={16} />
-                      </button>
-                    )}
-
-                    {rental.images.length > 1 && (
-                      <div className="image-dots">
-                        {rental.images.map((_, index) => (
-                          <div
-                            key={index}
-                            className={`image-dot ${index === currentImageIndex ? "active" : ""}`}
-                            onClick={() => setRentalImageIndexes((prev) => ({ ...prev, [rental.id]: index }))}
-                          />
-                        ))}
-                      </div>
-                    )}
+                    <button
+                      className={`action-btn favorite-btn ${favoriteRentals[rental.id] ? "favorited" : ""}`}
+                      onClick={() => toggleFavorite(rental.id)}
+                      aria-label={favoriteRentals[rental.id] ? "Remove from favorites" : "Add to favorites"}
+                      style={{ position: "absolute", top: "8px", right: "8px", zIndex: 10 }}
+                    >
+                      <svg
+                        width="20"
+                        height="20"
+                        viewBox="0 0 16 16"
+                        fill={favoriteRentals[rental.id] ? "currentColor" : "none"}
+                        xmlns="http://www.w3.org/2000/svg"
+                      >
+                        <path
+                          d="M8 14L7.05 13.15C3.4 9.86 1 7.74 1 5.25C1 3.42 2.42 2 4.25 2C5.27 2 6.27 2.49 7 3.24C7.73 2.49 8.73 2 9.75 2C11.58 2 13 3.42 13 5.25C13 7.74 10.6 9.86 6.95 13.15L8 14Z"
+                          stroke="currentColor"
+                          strokeWidth="1.5"
+                        />
+                      </svg>
+                    </button>
                   </div>
 
                   <div className="rental-info">

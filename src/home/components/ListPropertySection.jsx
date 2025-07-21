@@ -24,7 +24,7 @@ export default function ListPropertySection() {
           className="list-property-background"
         />
         <div ref={contentRef} className={`list-property-content ${contentVisible ? "visible" : ""}`}>
-          <h2 className="list-property-title">Rent your property confidently with Vrbo</h2>
+          <h2 className="list-property-title">Rent your property confidently with Signature Space</h2>
           <p className="list-property-description">
             With live-support, quick signup, and highly-rated guests, hosting on Vrbo can feel like a vacation.
           </p>
