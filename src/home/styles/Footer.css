@@ -1,5 +1,6 @@
 /* Footer Section Styles */
 .footer {
+  margin-top: 10px;
   background: #2c2c2c; /* Dark gradient for better alignment */
   color: #e2e8f0; /* Light text color */
   padding: 60px 20px 30px; /* Ample padding */

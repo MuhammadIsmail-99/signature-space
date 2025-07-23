@@ -2,6 +2,8 @@
 "use client";
 
 import { useState, useEffect, useCallback } from "react";
+import { ChevronLeftIcon, ChevronRightIcon } from "lucide-react";
+
 import { renderIcon } from "../utils.js"; // Assuming renderIcon is correctly implemented
 
 const getDaysInMonth = (year, month) => new Date(year, month + 1, 0).getDate();
@@ -170,9 +172,9 @@ export default function AvailabilitySection({ checkInDate, checkOutDate, setChec
   const handlePrevMonth = () => {
     // Prevent navigating to past months if all dates in the current month are past/booked
     const firstDayOfCurrentMonth = new Date(currentMonth.getFullYear(), currentMonth.getMonth(), 1);
-    firstDayOfCurrentMonth.setHours(0,0,0,0);
+    firstDayOfCurrentMonth.setHours(0, 0, 0, 0);
     const today = new Date();
-    today.setHours(0,0,0,0);
+    today.setHours(0, 0, 0, 0);
 
     if (firstDayOfCurrentMonth > today) { // Only allow going back if the current month's first day is in the future
       setCurrentMonth((prev) => {
@@ -218,18 +220,21 @@ export default function AvailabilitySection({ checkInDate, checkOutDate, setChec
 
   return (
     <div className="card availability-section">
-      <h2 className="availability-header">Availability</h2>
       <div className="nights-summary">
         {numberOfNights > 0 ? `${numberOfNights} nights in stay` : "Select your dates"}
       </div>
       <div className="date-range-summary">{dateRangeText}</div>
 
       <div className="calendar-navigation">
-        {/* Disable prev month button if current month is in the past */}
-        <button onClick={handlePrevMonth} disabled={currentMonth.getMonth() < today.getMonth() && currentMonth.getFullYear() <= today.getFullYear()}>
-          {renderIcon("ChevronLeft")}
+        <button
+          onClick={handlePrevMonth}
+          disabled={currentMonth.getMonth() < today.getMonth() && currentMonth.getFullYear() <= today.getFullYear()}
+        >
+          <ChevronLeftIcon size={20} />
         </button>
-        <button onClick={handleNextMonth}>{renderIcon("ChevronRight")}</button>
+        <button onClick={handleNextMonth}>
+          <ChevronRightIcon size={20} />
+        </button>
       </div>
 
       <div className="calendar-grid-container">

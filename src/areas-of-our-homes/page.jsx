@@ -8,6 +8,7 @@ import PropertyCard from "./components/PropertyCard"
 import MapSection from "./components/MapSection"
 import "./globals.css"
 import { dummyProperties } from '../utils/dummyData';
+import Footer from "../home/components/Footer.jsx"
 
 // Assuming dummyProperties is correctly structured as per our last conversation
 
@@ -200,6 +201,7 @@ export default function ListingPage() {
   const filteredProperties = filterProperties()
 
   return (
+    <>
     <div className="app-wrapper">
       <ListingHeader onApplyFilters={handleApplyFilters} initialFilters={appliedFilters} />
       <div className="main-content-wrapper static-map-layout">
@@ -225,5 +227,7 @@ export default function ListingPage() {
         </div>
       </div>
     </div>
+        <Footer/>
+        </>
   )
 }
