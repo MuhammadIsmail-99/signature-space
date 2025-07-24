@@ -46,9 +46,9 @@ export default function HeroSection() {
               Anytime, Anywhere.
             </span>
           </h1>
-          <p className={`hero-subtitle ${isLoaded ? "animate" : ""}`} style={{ animationDelay: "0.8s" }}>
+          {/* <p className={`hero-subtitle ${isLoaded ? "animate" : ""}`} style={{ animationDelay: "0.8s" }}>
             Discover amazing properties for your next adventure. From cozy apartments to luxury villas.
-          </p>
+          </p> */}
           <div className={`hero-search ${isLoaded ? "animate" : ""}`} style={{ animationDelay: "1.1s" }}>
             <SearchBar />
           </div>

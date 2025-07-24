@@ -54,6 +54,13 @@
   transform: translateY(30px);
   transition: all 0.8s ease-out;
 }
+.hero-title-line:nth-child(2) {
+  margin-bottom: 80px;
+  display: block;
+  opacity: 0;
+  transform: translateY(30px);
+  transition: all 0.8s ease-out;
+}
 
 .hero-title-line.animate {
   opacity: 1;

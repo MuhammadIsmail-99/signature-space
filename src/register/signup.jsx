@@ -1,287 +1,431 @@
+/* global grecaptcha */ // Declare grecaptcha as a global variable for ESLint
 "use client"
-
-import { useState } from "react" // Add useState
-import { X, ChevronDown, Mail, ArrowLeft } from "lucide-react" // Add ArrowLeft
 import "./signup.css"
+import { useState, useEffect, useRef } from "react"
+import { X, ArrowLeft } from "lucide-react"
+import { RecaptchaVerifier, signInWithPhoneNumber } from "firebase/auth"
+import { auth, signInWithGoogle, sendEmailLink, isConfigured } from "../firebase"
 
 export default function LoginPopup({ isOpen, onClose }) {
-  const [currentStep, setCurrentStep] = useState("login") // 'login' or 'smsConfirmation'
-  const [phoneNumber, setPhoneNumber] = useState("") // To store the entered phone number
+  const [currentStep, setCurrentStep] = useState("login")
+  const [phoneNumber, setPhoneNumber] = useState("")
+  const [email, setEmail] = useState("")
+  const [loading, setLoading] = useState(false)
+  const [verificationCode, setVerificationCode] = useState(["", "", "", "", "", ""])
+  const [confirmationResult, setConfirmationResult] = useState(null)
+  const [countryCode, setCountryCode] = useState("+92") // Default to Pakistan
+  const [firebaseReady, setFirebaseReady] = useState(false)
+  const [configError, setConfigError] = useState("")
+  const [recaptchaReady, setRecaptchaReady] = useState(false)
+  const codeInputRefs = useRef([])
 
-  if (!isOpen) return null;
+  const actionCodeSettings = {
+    url: window.location.origin + "/finishSignUp",
+    handleCodeInApp: true,
+  }
+
+  // Check Firebase configuration on mount
+  useEffect(() => {
+    if (isConfigured() && auth) {
+      setFirebaseReady(true)
+      setConfigError("")
+      console.log("Firebase is ready for Signature Space")
+    } else {
+      setConfigError("Firebase authentication is not available.")
+      setFirebaseReady(false)
+    }
+  }, [])
+
+  // --- reCAPTCHA Setup ---
+  useEffect(() => {
+    if (isOpen && currentStep === "login" && firebaseReady) {
+      if (!auth) {
+        console.error("Firebase Auth instance is not available. Cannot initialize reCAPTCHA.")
+        return
+      }
+
+      // Clean up any existing reCAPTCHA
+      if (window.recaptchaVerifier) {
+        try {
+          window.recaptchaVerifier.clear()
+        } catch (e) {
+          console.log("Error clearing existing reCAPTCHA:", e)
+        }
+        delete window.recaptchaVerifier
+      }
+
+      // Clear the container
+      const container = document.getElementById("recaptcha-container")
+      if (container) {
+        container.innerHTML = ""
+      }
+
+      console.log("Initializing reCAPTCHA verifier for Signature Space...")
+
+      try {
+        window.recaptchaVerifier = new RecaptchaVerifier(auth, "recaptcha-container", {
+          size: "normal",
+          callback: (response) => {
+            console.log("reCAPTCHA solved:", response)
+            setRecaptchaReady(true)
+            setConfigError("") // Clear any previous errors
+          },
+          "expired-callback": () => {
+            console.warn("reCAPTCHA expired. Please try again.")
+            setRecaptchaReady(false)
+            setConfigError("Security verification expired. Please complete it again.")
+          },
+          "error-callback": (error) => {
+            console.error("reCAPTCHA error:", error)
+            setRecaptchaReady(false)
+            setConfigError("Security verification failed. Please refresh and try again.")
+          },
+        })
+
+        window.recaptchaVerifier
+          .render()
+          .then((widgetId) => {
+            console.log("reCAPTCHA widget rendered with ID:", widgetId)
+            window.recaptchaVerifier.widgetId = widgetId
+            setRecaptchaReady(true)
+            setConfigError("") // Clear any previous errors
+          })
+          .catch((renderError) => {
+            console.error("Error rendering reCAPTCHA widget:", renderError)
+            setRecaptchaReady(false)
+
+            if (
+              renderError.code === "auth/invalid-app-credential" ||
+              renderError.message.includes("Invalid site key")
+            ) {
+              setConfigError(
+                "Phone authentication is not properly configured. Please complete the Firebase setup steps below.",
+              )
+            } else if (renderError.message.includes("not loaded")) {
+              setConfigError("reCAPTCHA failed to load. Please check your internet connection and refresh the page.")
+            } else {
+              setConfigError("Security verification setup failed. Please refresh the page and try again.")
+            }
+          })
+      } catch (error) {
+        console.error("Error creating reCAPTCHA verifier:", error)
+        setRecaptchaReady(false)
+        setConfigError("Security verification is not available. Please check your internet connection.")
+      }
+    } else if (!isOpen && window.recaptchaVerifier) {
+      try {
+        if (window.grecaptcha && window.grecaptcha.reset && window.recaptchaVerifier.widgetId) {
+          window.grecaptcha.reset(window.recaptchaVerifier.widgetId)
+        }
+        window.recaptchaVerifier.clear()
+      } catch (e) {
+        console.log("Error cleaning up reCAPTCHA:", e)
+      }
+      delete window.recaptchaVerifier
+      setRecaptchaReady(false)
+      console.log("reCAPTCHA verifier cleaned up.")
+    }
+  }, [isOpen, currentStep, firebaseReady, auth])
+
+  // --- Google Sign-In ---
+  const handleGoogleSignIn = async () => {
+    if (!firebaseReady) {
+      setConfigError("Authentication service is not available. Please check your configuration.")
+      return
+    }
+
+    setLoading(true)
+    setConfigError("")
+    try {
+      const result = await signInWithGoogle()
+      const user = result.user
+      console.log("✅ Google sign-in success:", user)
+      alert("Successfully signed in with Google!")
+      onClose()
+    } catch (error) {
+      console.error("❌ Google sign-in error:", error.code, error.message)
+      if (error.code === "auth/popup-blocked") {
+        setConfigError("Pop-up was blocked. Please allow pop-ups for this site and try again.")
+      } else if (error.code === "auth/popup-closed-by-user") {
+        setConfigError("Sign-in was cancelled. Please try again.")
+      } else {
+        setConfigError(`Failed to sign in with Google: ${error.message || error.code}`)
+      }
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  // --- Email Link Sign-In ---
+  const handleEmailLinkSignIn = async () => {
+    if (!firebaseReady) {
+      setConfigError("Authentication service is not available. Please check your configuration.")
+      return
+    }
+
+    setLoading(true)
+    setConfigError("")
+    if (!isValidEmail(email)) {
+      setConfigError("Please enter a valid email address.")
+      setLoading(false)
+      return
+    }
+    try {
+      await sendEmailLink(email, actionCodeSettings)
+      window.localStorage.setItem("emailForSignIn", email)
+      alert("Check your email for the sign-in link.")
+      setEmail("")
+      onClose()
+    } catch (error) {
+      console.error("Error sending email link:", error)
+      setConfigError(`Failed to send email link: ${error.message || error.code}`)
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  const isValidEmail = (email) => {
+    return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)
+  }
+
+  // --- Phone Authentication - Send SMS ---
+  const handleSendSMS = async () => {
+    if (!firebaseReady) {
+      setConfigError("Authentication service is not available. Please check your configuration.")
+      return
+    }
+
+    if (!recaptchaReady || !window.recaptchaVerifier) {
+      setConfigError("Please complete the security verification (reCAPTCHA) first.")
+      return
+    }
+
+    setLoading(true)
+    setConfigError("")
+    const fullPhoneNumber = countryCode + phoneNumber
+    if (!fullPhoneNumber.match(/^\+\d{10,15}$/)) {
+      setConfigError("Please enter a valid phone number (e.g., 3001234567).")
+      setLoading(false)
+      return
+    }
+
+    try {
+      const result = await signInWithPhoneNumber(auth, fullPhoneNumber, window.recaptchaVerifier)
+      setConfirmationResult(result)
+      setCurrentStep("smsConfirmation")
+      alert("Verification code sent to your phone!")
+    } catch (error) {
+      console.error("Error sending SMS:", error)
+      let errorMessage = "Failed to send verification code. Please try again."
+
+      if (error.code === "auth/invalid-phone-number") {
+        errorMessage = "The phone number provided is invalid."
+      } else if (error.code === "auth/too-many-requests") {
+        errorMessage = "Too many requests. Please try again later."
+      } else if (error.code === "auth/captcha-check-failed") {
+        errorMessage = "Security check failed. Please complete the reCAPTCHA and try again."
+      } else if (error.code === "auth/invalid-app-credential") {
+        errorMessage =
+          "Phone authentication is not properly configured in Firebase. Please check the setup instructions."
+      } else if (error.message.includes("Invalid site key")) {
+        errorMessage = "reCAPTCHA configuration error. Please check Firebase phone authentication setup."
+      }
+
+      setConfigError(errorMessage)
+      setRecaptchaReady(false)
+
+      // Reset reCAPTCHA
+      if (window.grecaptcha && window.grecaptcha.reset && window.recaptchaVerifier?.widgetId) {
+        window.grecaptcha.reset(window.recaptchaVerifier.widgetId)
+      }
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  // --- Phone Authentication - Verify SMS Code ---
+  const handleVerifySMSCode = async () => {
+    if (!firebaseReady) {
+      setConfigError("Authentication service is not available. Please check your configuration.")
+      return
+    }
+
+    setLoading(true)
+    setConfigError("")
+    const code = verificationCode.join("")
+    if (code.length !== 6) {
+      setConfigError("Please enter the full 6-digit code.")
+      setLoading(false)
+      return
+    }
+    if (!confirmationResult) {
+      setConfigError("No verification process initiated. Please send a code first.")
+      setLoading(false)
+      return
+    }
+    try {
+      const result = await confirmationResult.confirm(code)
+      const user = result.user
+      console.log("✅ Phone sign-in success:", user)
+      alert("Successfully signed in with phone number!")
+      setPhoneNumber("")
+      setVerificationCode(["", "", "", "", "", ""])
+      setConfirmationResult(null)
+      onClose()
+    } catch (error) {
+      console.error("❌ Error verifying SMS code:", error)
+      let errorMessage = "Incorrect or expired code. Please try again."
+      if (error.code === "auth/invalid-verification-code") {
+        errorMessage = "The verification code is incorrect."
+      } else if (error.code === "auth/code-expired") {
+        errorMessage = "The verification code has expired. Please request a new one."
+      }
+      setConfigError(errorMessage)
+      setVerificationCode(["", "", "", "", "", ""])
+      if (codeInputRefs.current[0]) {
+        codeInputRefs.current[0].focus()
+      }
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  // --- SMS Code Input Handlers ---
+  const handleCodeInputChange = (e, index) => {
+    const { value } = e.target
+    if (value.length > 1 || (value.length === 1 && !/[0-9]/.test(value))) {
+      return
+    }
+    const newCode = [...verificationCode]
+    newCode[index] = value
+    setVerificationCode(newCode)
+    if (value && index < 5) {
+      codeInputRefs.current[index + 1].focus()
+    }
+  }
+
+  const handleCodeInputKeyDown = (e, index) => {
+    if (e.key === "Backspace" && !verificationCode[index] && index > 0) {
+      codeInputRefs.current[index - 1].focus()
+    }
+  }
+
+  if (!isOpen) return null
 
   return (
     <div className="popup-overlay">
       <div className="popup-content">
         <div className="popup-header">
-          {currentStep === "smsConfirmation" && (
-            <button className="popup-back-button" onClick={() => setCurrentStep("login")} aria-label="Back">
+          {(currentStep === "smsConfirmation" || currentStep === "email") && (
+            <button
+              className="popup-back-button"
+              onClick={() => {
+                setCurrentStep("login")
+                setPhoneNumber("")
+                setEmail("")
+                setVerificationCode(["", "", "", "", "", ""])
+                setConfirmationResult(null)
+                setConfigError("")
+                setRecaptchaReady(false)
+              }}
+              aria-label="Back"
+            >
               <ArrowLeft size={18} />
             </button>
           )}
-          <button
-            className="popup-close-button"
-            aria-label="Close"
-            onClick={onClose}
-          >
+          <button className="popup-close-button" aria-label="Close" onClick={onClose}>
             <X size={18} />
           </button>
-          <h2 className="popup-title">{currentStep === "login" ? "Log in or sign up" : "Confirm your number"}</h2>
+          <h2 className="popup-title">
+            {currentStep === "login"
+              ? "Log in or sign up"
+              : currentStep === "smsConfirmation"
+                ? "Confirm your number"
+                : "Sign up with Email"}
+          </h2>
         </div>
         <div className="popup-body">
           {currentStep === "login" && (
             <>
               <h1 className="welcome-heading">Welcome to Signature Space</h1>
+
+              {!firebaseReady && (
+                <div className="config-warning">
+                  <h3>🔧 Firebase Setup Required</h3>
+                  <p>To enable phone authentication, please complete these steps:</p>
+                  <ol>
+                    <li>
+                      Go to{" "}
+                      <a
+                        href="https://console.firebase.google.com/project/signaturespacesignup/authentication/providers"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                      >
+                        Firebase Authentication
+                      </a>
+                    </li>
+                    <li>
+                      Enable the <strong>Phone</strong> sign-in method
+                    </li>
+                    <li>
+                      Add <code>localhost</code> to{" "}
+                      <a
+                        href="https://console.firebase.google.com/project/signaturespacesignup/authentication/settings"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                      >
+                        Authorized domains
+                      </a>
+                    </li>
+                    <li>
+                      Enable <strong>Google</strong> and <strong>Email/Password</strong> providers
+                    </li>
+                  </ol>
+                </div>
+              )}
+
+              {configError && (
+                <div className="error-message" role="alert">
+                  {configError}
+                  {configError.includes("Phone authentication is not properly configured") && (
+                    <div style={{ marginTop: "8px", fontSize: "12px" }}>
+                      <strong>Quick Fix:</strong> Go to{" "}
+                      <a
+                        href="https://console.firebase.google.com/project/signaturespacesignup/authentication/providers"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        style={{ color: "#1976d2" }}
+                      >
+                        Firebase Console
+                      </a>{" "}
+                      and enable Phone authentication.
+                    </div>
+                  )}
+                </div>
+              )}
+
               <div className="input-group">
                 <div className="country-code-input">
                   <div className="input-label">Country code</div>
-                  {/* <input type="text" className="input-field" value="Pakistan (+92)" readOnly /> */}
-                  <select id="countryCode" name="countryCode" className="input-field" readOnly>
-                    <option value="">Select Country</option>
-                    <option value="+93">Afghanistan (+93)</option>
-                    <option value="+355">Albania (+355)</option>
-                    <option value="+213">Algeria (+213)</option>
-                    <option value="+376">Andorra (+376)</option>
-                    <option value="+244">Angola (+244)</option>
-                    <option value="+1-264">Anguilla (+1-264)</option>
-                    <option value="+1-268">Antigua & Barbuda (+1-268)</option>
-                    <option value="+54">Argentina (+54)</option>
-                    <option value="+374">Armenia (+374)</option>
-                    <option value="+297">Aruba (+297)</option>
-                    <option value="+61">Australia (+61)</option>
-                    <option value="+43">Austria (+43)</option>
-                    <option value="+994">Azerbaijan (+994)</option>
-                    <option value="+1-242">Bahamas (+1-242)</option>
-                    <option value="+973">Bahrain (+973)</option>
-                    <option value="+880">Bangladesh (+880)</option>
-                    <option value="+1-246">Barbados (+1-246)</option>
-                    <option value="+375">Belarus (+375)</option>
-                    <option value="+32">Belgium (+32)</option>
-                    <option value="+501">Belize (+501)</option>
-                    <option value="+229">Benin (+229)</option>
-                    <option value="+1-441">Bermuda (+1-441)</option>
-                    <option value="+975">Bhutan (+975)</option>
-                    <option value="+591">Bolivia (+591)</option>
-                    <option value="+387">Bosnia & Herzegovina (+387)</option>
-                    <option value="+267">Botswana (+267)</option>
-                    <option value="+55">Brazil (+55)</option>
-                    <option value="+673">Brunei (+673)</option>
-                    <option value="+359">Bulgaria (+359)</option>
-                    <option value="+226">Burkina Faso (+226)</option>
-                    <option value="+257">Burundi (+257)</option>
-                    <option value="+238">Cabo Verde (+238)</option>
-                    <option value="+855">Cambodia (+855)</option>
-                    <option value="+237">Cameroon (+237)</option>
-                    <option value="+1">Canada (+1)</option>
-                    <option value="+1-345">Cayman Islands (+1-345)</option>
-                    <option value="+236">Central African Republic (+236)</option>
-                    <option value="+235">Chad (+235)</option>
-                    <option value="+56">Chile (+56)</option>
-                    <option value="+86">China (+86)</option>
-                    <option value="+57">Colombia (+57)</option>
-                    <option value="+269">Comoros (+269)</option>
-                    <option value="+243">Congo (DRC) (+243)</option>
-                    <option value="+242">Congo (Republic) (+242)</option>
-                    <option value="+682">Cook Islands (+682)</option>
-                    <option value="+506">Costa Rica (+506)</option>
-                    <option value="+385">Croatia (+385)</option>
-                    <option value="+53">Cuba (+53)</option>
-                    <option value="+357">Cyprus (+357)</option>
-                    <option value="+420">Czech Republic (+420)</option>
-                    <option value="+45">Denmark (+45)</option>
-                    <option value="+253">Djibouti (+253)</option>
-                    <option value="+1-767">Dominica (+1-767)</option>
-                    <option value="+1-809">Dominican Republic (+1-809)</option>
-                    <option value="+593">Ecuador (+593)</option>
-                    <option value="+20">Egypt (+20)</option>
-                    <option value="+503">El Salvador (+503)</option>
-                    <option value="+240">Equatorial Guinea (+240)</option>
-                    <option value="+291">Eritrea (+291)</option>
-                    <option value="+372">Estonia (+372)</option>
-                    <option value="+251">Ethiopia (+251)</option>
-                    <option value="+500">Falkland Islands (+500)</option>
-                    <option value="+298">Faroe Islands (+298)</option>
-                    <option value="+679">Fiji (+679)</option>
-                    <option value="+358">Finland (+358)</option>
-                    <option value="+33">France (+33)</option>
-                    <option value="+594">French Guiana (+594)</option>
-                    <option value="+689">French Polynesia (+689)</option>
-                    <option value="+241">Gabon (+241)</option>
-                    <option value="+220">Gambia (+220)</option>
-                    <option value="+995">Georgia (+995)</option>
-                    <option value="+49">Germany (+49)</option>
-                    <option value="+233">Ghana (+233)</option>
-                    <option value="+350">Gibraltar (+350)</option>
-                    <option value="+30">Greece (+30)</option>
-                    <option value="+299">Greenland (+299)</option>
-                    <option value="+1-473">Grenada (+1-473)</option>
-                    <option value="+590">Guadeloupe (+590)</option>
-                    <option value="+1-671">Guam (+1-671)</option>
-                    <option value="+502">Guatemala (+502)</option>
-                    <option value="+44-1481">Guernsey (+44-1481)</option>
-                    <option value="+224">Guinea (+224)</option>
-                    <option value="+245">Guinea-Bissau (+245)</option>
-                    <option value="+592">Guyana (+592)</option>
-                    <option value="+509">Haiti (+509)</option>
-                    <option value="+504">Honduras (+504)</option>
-                    <option value="+852">Hong Kong (+852)</option>
-                    <option value="+36">Hungary (+36)</option>
-                    <option value="+354">Iceland (+354)</option>
-                    <option value="+91">India (+91)</option>
-                    <option value="+62">Indonesia (+62)</option>
-                    <option value="+98">Iran (+98)</option>
-                    <option value="+964">Iraq (+964)</option>
-                    <option value="+353">Ireland (+353)</option>
-                    <option value="+44-1624">Isle of Man (+44-1624)</option>
-                    <option value="+972">Israel (+972)</option>
-                    <option value="+39">Italy (+39)</option>
-                    <option value="+225">Ivory Coast (+225)</option>
-                    <option value="+1-876">Jamaica (+1-876)</option>
-                    <option value="+81">Japan (+81)</option>
-                    <option value="+44-1534">Jersey (+44-1534)</option>
-                    <option value="+962">Jordan (+962)</option>
-                    <option value="+7">Kazakhstan (+7)</option>
-                    <option value="+254">Kenya (+254)</option>
-                    <option value="+686">Kiribati (+686)</option>
-                    <option value="+383">Kosovo (+383)</option>
-                    <option value="+965">Kuwait (+965)</option>
-                    <option value="+996">Kyrgyzstan (+996)</option>
-                    <option value="+856">Laos (+856)</option>
-                    <option value="+371">Latvia (+371)</option>
-                    <option value="+961">Lebanon (+961)</option>
-                    <option value="+266">Lesotho (+266)</option>
-                    <option value="+231">Liberia (+231)</option>
-                    <option value="+218">Libya (+218)</option>
-                    <option value="+423">Liechtenstein (+423)</option>
-                    <option value="+370">Lithuania (+370)</option>
-                    <option value="+352">Luxembourg (+352)</option>
-                    <option value="+853">Macau (+853)</option>
-                    <option value="+389">North Macedonia (+389)</option>
-                    <option value="+261">Madagascar (+261)</option>
-                    <option value="+265">Malawi (+265)</option>
-                    <option value="+60">Malaysia (+60)</option>
-                    <option value="+960">Maldives (+960)</option>
-                    <option value="+223">Mali (+223)</option>
-                    <option value="+356">Malta (+356)</option>
-                    <option value="+692">Marshall Islands (+692)</option>
-                    <option value="+596">Martinique (+596)</option>
-                    <option value="+222">Mauritania (+222)</option>
-                    <option value="+230">Mauritius (+230)</option>
-                    <option value="+262">Mayotte (+262)</option>
-                    <option value="+52">Mexico (+52)</option>
-                    <option value="+691">Micronesia (+691)</option>
-                    <option value="+373">Moldova (+373)</option>
-                    <option value="+377">Monaco (+377)</option>
-                    <option value="+976">Mongolia (+976)</option>
-                    <option value="+382">Montenegro (+382)</option>
-                    <option value="+1-664">Montserrat (+1-664)</option>
-                    <option value="+212">Morocco (+212)</option>
-                    <option value="+258">Mozambique (+258)</option>
-                    <option value="+95">Myanmar (+95)</option>
-                    <option value="+264">Namibia (+264)</option>
-                    <option value="+674">Nauru (+674)</option>
-                    <option value="+977">Nepal (+977)</option>
-                    <option value="+31">Netherlands (+31)</option>
-                    <option value="+599">Netherlands Antilles (+599)</option>
-                    <option value="+687">New Caledonia (+687)</option>
-                    <option value="+64">New Zealand (+64)</option>
-                    <option value="+505">Nicaragua (+505)</option>
-                    <option value="+227">Niger (+227)</option>
-                    <option value="+234">Nigeria (+234)</option>
-                    <option value="+683">Niue (+683)</option>
-                    <option value="+850">North Korea (+850)</option>
-                    <option value="+47">Norway (+47)</option>
-                    <option value="+968">Oman (+968)</option>
+                  <select
+                    id="countryCode"
+                    name="countryCode"
+                    className="input-field"
+                    value={countryCode}
+                    onChange={(e) => setCountryCode(e.target.value)}
+                    disabled={!firebaseReady}
+                  >
                     <option value="+92">Pakistan (+92)</option>
-                    <option value="+680">Palau (+680)</option>
-                    <option value="+970">Palestine (+970)</option>
-                    <option value="+507">Panama (+507)</option>
-                    <option value="+675">Papua New Guinea (+675)</option>
-                    <option value="+595">Paraguay (+595)</option>
-                    <option value="+51">Peru (+51)</option>
-                    <option value="+63">Philippines (+63)</option>
-                    <option value="+48">Poland (+48)</option>
-                    <option value="+351">Portugal (+351)</option>
-                    <option value="+1-787">Puerto Rico (+1-787)</option>
-                    <option value="+974">Qatar (+974)</option>
-                    <option value="+262">Reunion (+262)</option>
-                    <option value="+40">Romania (+40)</option>
-                    <option value="+7">Russia (+7)</option>
-                    <option value="+250">Rwanda (+250)</option>
-                    <option value="+590">Saint Barthelemy (+590)</option>
-                    <option value="+290">Saint Helena (+290)</option>
-                    <option value="+1-869">Saint Kitts & Nevis (+1-869)</option>
-                    <option value="+1-758">Saint Lucia (+1-758)</option>
-                    <option value="+590">Saint Martin (+590)</option>
-                    <option value="+508">Saint Pierre & Miquelon (+508)</option>
-                    <option value="+1-784">Saint Vincent & Grenadines (+1-784)</option>
-                    <option value="+685">Samoa (+685)</option>
-                    <option value="+378">San Marino (+378)</option>
-                    <option value="+239">Sao Tome & Principe (+239)</option>
-                    <option value="+966">Saudi Arabia (+966)</option>
-                    <option value="+221">Senegal (+221)</option>
-                    <option value="+381">Serbia (+381)</option>
-                    <option value="+248">Seychelles (+248)</option>
-                    <option value="+232">Sierra Leone (+232)</option>
-                    <option value="+65">Singapore (+65)</option>
-                    <option value="+1-721">Sint Maarten (+1-721)</option>
-                    <option value="+421">Slovakia (+421)</option>
-                    <option value="+386">Slovenia (+386)</option>
-                    <option value="+677">Solomon Islands (+677)</option>
-                    <option value="+252">Somalia (+252)</option>
-                    <option value="+27">South Africa (+27)</option>
-                    <option value="+82">South Korea (+82)</option>
-                    <option value="+211">South Sudan (+211)</option>
-                    <option value="+34">Spain (+34)</option>
-                    <option value="+94">Sri Lanka (+94)</option>
-                    <option value="+249">Sudan (+249)</option>
-                    <option value="+597">Suriname (+597)</option>
-                    <option value="+47">Svalbard & Jan Mayen (+47)</option>
-                    <option value="+268">Swaziland (+268)</option>
-                    <option value="+46">Sweden (+46)</option>
-                    <option value="+41">Switzerland (+41)</option>
-                    <option value="+963">Syria (+963)</option>
-                    <option value="+886">Taiwan (+886)</option>
-                    <option value="+992">Tajikistan (+992)</option>
-                    <option value="+255">Tanzania (+255)</option>
-                    <option value="+66">Thailand (+66)</option>
-                    <option value="+670">Timor-Leste (+670)</option>
-                    <option value="+228">Togo (+228)</option>
-                    <option value="+690">Tokelau (+690)</option>
-                    <option value="+676">Tonga (+676)</option>
-                    <option value="+1-868">Trinidad & Tobago (+1-868)</option>
-                    <option value="+216">Tunisia (+216)</option>
-                    <option value="+90">Turkey (+90)</option>
-                    <option value="+993">Turkmenistan (+993)</option>
-                    <option value="+1-649">Turks & Caicos Islands (+1-649)</option>
-                    <option value="+688">Tuvalu (+688)</option>
-                    <option value="+256">Uganda (+256)</option>
-                    <option value="+380">Ukraine (+380)</option>
-                    <option value="+971">United Arab Emirates (+971)</option>
-                    <option value="+44">United Kingdom (+44)</option>
-                    <option value="+1">United States (+1)</option>
-                    <option value="+598">Uruguay (+598)</option>
-                    <option value="+998">Uzbekistan (+998)</option>
-                    <option value="+678">Vanuatu (+678)</option>
-                    <option value="+379">Vatican City (+379)</option>
-                    <option value="+58">Venezuela (+58)</option>
-                    <option value="+84">Vietnam (+84)</option>
-                    <option value="+1-284">Virgin Islands (British) (+1-284)</option>
-                    <option value="+1-340">Virgin Islands (U.S.) (+1-340)</option>
-                    <option value="+681">Wallis & Futuna (+681)</option>
-                    <option value="+967">Yemen (+967)</option>
-                    <option value="+260">Zambia (+260)</option>
-                    <option value="+263">Zimbabwe (+263)</option>
                   </select>
-                  {/* <ChevronDown size={16} className="arrow-icon" /> */}
                 </div>
                 <div>
                   <input
                     type="tel"
                     className="input-field"
-                    placeholder="Phone number"
+                    placeholder="Phone number (e.g., 3001234567)"
                     value={phoneNumber}
                     onChange={(e) => setPhoneNumber(e.target.value)}
+                    disabled={!firebaseReady}
                   />
                 </div>
               </div>
@@ -289,37 +433,122 @@ export default function LoginPopup({ isOpen, onClose }) {
                 {"We'll call or text you to confirm your number. Standard message and data rates apply. "}
                 <span className="privacy-link">Privacy Policy</span>
               </p>
+
+              {/* reCAPTCHA container - always show for better UX */}
+              <div className="recaptcha-container">
+                <div id="recaptcha-container"></div>
+                {!recaptchaReady && firebaseReady && (
+                  <div className="recaptcha-loading">
+                    <p>Loading security verification...</p>
+                  </div>
+                )}
+              </div>
+
               <button
                 className="continue-button"
-                onClick={() => setCurrentStep("smsConfirmation")}
-                disabled={!phoneNumber}
+                onClick={handleSendSMS}
+                disabled={!phoneNumber || loading || !firebaseReady || !recaptchaReady}
               >
-                Continue
+                {loading
+                  ? "Sending SMS..."
+                  : !firebaseReady
+                    ? "Setup Required"
+                    : !recaptchaReady
+                      ? "Complete Security Check"
+                      : "Continue"}
               </button>
+
               <div className="or-separator">or</div>
-              <button className="social-button">
-                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 488 512" height={25} width={25}><path d="M488 261.8C488 403.3 391.1 504 248 504 110.8 504 0 393.2 0 256S110.8 8 248 8c66.8 0 123 24.5 166.3 64.9l-67.5 64.9C258.5 52.6 94.3 116.6 94.3 256c0 86.5 69.1 156.6 153.7 156.6 98.2 0 135-70.4 140.8-106.9H248v-85.3h236.1c2.3 12.7 3.9 24.9 3.9 41.4z" /></svg>
+              <button className="social-button" onClick={handleGoogleSignIn} disabled={loading || !firebaseReady}>
+                <svg width="20" height="20" viewBox="0 0 24 24">
+                    <path
+                      fill="#4285F4"
+                      d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"
+                    />
+                    <path
+                      fill="#34A853"
+                      d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"
+                    />
+                    <path
+                      fill="#FBBC05"
+                      d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"
+                    />
+                    <path
+                      fill="#EA4335"
+                      d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"
+                    />
+                  </svg>
                 Continue with Google
               </button>
-              <button className="social-button">
-                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 384 512" height={25} width={25}><path d="M318.7 268.7c-.2-36.7 16.4-64.4 50-84.8-18.8-26.9-47.2-41.7-84.7-44.6-35.5-2.8-74.3 20.7-88.5 20.7-15 0-49.4-19.7-76.4-19.7C63.3 141.2 4 184.8 4 273.5q0 39.3 14.4 81.2c12.8 36.7 59 126.7 107.2 125.2 25.2-.6 43-17.9 75.8-17.9 31.8 0 48.3 17.9 76.4 17.9 48.6-.7 90.4-82.5 102.6-119.3-65.2-30.7-61.7-90-61.7-91.9zm-56.6-164.2c27.3-32.4 24.8-61.9 24-72.5-24.1 1.4-52 16.4-67.9 34.9-17.5 19.8-27.8 44.3-25.6 71.9 26.1 2 49.9-11.4 69.5-34.3z" /></svg>
+              <button className="social-button" disabled={loading || !firebaseReady}>
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="#1778F2">
+                    <path d="M12.152 6.896c-.948 0-2.415-1.078-3.96-1.04-2.04.027-3.91 1.183-4.961 3.014-2.117 3.675-.546 9.103 1.519 12.09 1.013 1.454 2.208 3.09 3.792 3.039 1.52-.065 2.09-.987 3.935-.987 1.831 0 2.35.987 3.96.948 1.637-.026 2.676-1.48 3.676-2.948 1.156-1.688 1.636-3.325 1.662-3.415-.039-.013-3.182-1.221-3.22-4.857-.026-3.04 2.48-4.494 2.597-4.559-1.429-2.09-3.623-2.324-4.39-2.376-2-.156-3.675 1.09-4.61 1.09zM15.53 3.83c.843-1.012 1.4-2.427 1.245-3.83-1.207.052-2.662.805-3.532 1.818-.78.896-1.454 2.338-1.273 3.714 1.338.104 2.715-.688 3.559-1.701" />
+                  </svg>
                 Continue with Apple
               </button>
-              <button className="social-button">
-                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" height={25} width={25}><path d="M48 64C21.5 64 0 85.5 0 112c0 15.1 7.1 29.3 19.2 38.4L236.8 313.6c11.4 8.5 27 8.5 38.4 0L492.8 150.4c12.1-9.1 19.2-23.3 19.2-38.4c0-26.5-21.5-48-48-48L48 64zM0 176L0 384c0 35.3 28.7 64 64 64l384 0c35.3 0 64-28.7 64-64l0-208L294.4 339.2c-22.8 17.1-54 17.1-76.8 0L0 176z" /></svg>
+              <button
+                className="social-button"
+                onClick={() => setCurrentStep("email")}
+                disabled={loading || !firebaseReady}
+              >
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" height={25} width={25}>
+                  <path d="M48 64C21.5 64 0 85.5 0 112c0 15.1 7.1 29.3 19.2 38.4L236.8 313.6c11.4 8.5 27 8.5 38.4 0L492.8 150.4c12.1-9.1 19.2-23.3 19.2-38.4c0-26.5-21.5-48-48-48L48 64zM0 176L0 384c0 35.3 28.7 64 64 64l384 0c35.3 0 64-28.7 64-64l0-208L294.4 339.2c-22.8 17.1-54 17.1-76.8 0L0 176z" />
+                </svg>
                 Continue with email
               </button>
-              <button className="social-button">
-                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" height={25} width={25}><path d="M512 256C512 114.6 397.4 0 256 0S0 114.6 0 256C0 376 82.7 476.8 194.2 504.5V334.2H141.4V256h52.8V222.3c0-87.1 39.4-127.5 125-127.5c16.2 0 44.2 3.2 55.7 6.4V172c-6-.6-16.5-1-29.6-1c-42 0-58.2 15.9-58.2 57.2V256h83.6l-14.4 78.2H287V510.1C413.8 494.8 512 386.9 512 256h0z" /></svg>
+              <button className="social-button" disabled={loading || !firebaseReady}>
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="#1877F2">
+                    <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z" />
+                  </svg>
                 Continue with Facebook
+              </button>
+            </>
+          )}
+          {currentStep === "email" && (
+            <>
+              <h1 className="welcome-heading">Sign up with Email</h1>
+
+              {configError && (
+                <div className="error-message" role="alert">
+                  {configError}
+                </div>
+              )}
+
+              <div className="input-group">
+                <input
+                  type="email"
+                  className="input-field"
+                  placeholder="Email address"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  disabled={!firebaseReady}
+                />
+              </div>
+              <p className="privacy-text">
+                {"We'll send you a confirmation email. "}
+                <span className="privacy-link">Privacy Policy</span>
+              </p>
+              <button
+                className="continue-button"
+                disabled={!isValidEmail(email) || loading || !firebaseReady}
+                onClick={handleEmailLinkSignIn}
+              >
+                {loading ? "Sending..." : firebaseReady ? "Continue" : "Setup Required"}
               </button>
             </>
           )}
           {currentStep === "smsConfirmation" && (
             <>
               <p className="privacy-text" style={{ fontSize: "16px", color: "#222222", marginBottom: "20px" }}>
-                Enter the code we sent over SMS to {phoneNumber || "+92 3445428001"}:
+                Enter the code we sent over SMS to {countryCode} {phoneNumber}:
               </p>
+
+              {configError && (
+                <div className="error-message" role="alert">
+                  {configError}
+                </div>
+              )}
+
               <div className="sms-code-input-container">
                 {Array.from({ length: 6 }).map((_, index) => (
                   <input
@@ -328,15 +557,35 @@ export default function LoginPopup({ isOpen, onClose }) {
                     maxLength="1"
                     className="sms-code-input"
                     placeholder="-"
+                    value={verificationCode[index]}
+                    onChange={(e) => handleCodeInputChange(e, index)}
+                    onKeyDown={(e) => handleCodeInputKeyDown(e, index)}
+                    ref={(el) => (codeInputRefs.current[index] = el)}
                     aria-label={`SMS code digit ${index + 1}`}
+                    autoFocus={index === 0}
+                    disabled={!firebaseReady}
                   />
                 ))}
               </div>
-              <button className="choose-option-link" onClick={() => setCurrentStep("login")}>
+              <button
+                className="choose-option-link"
+                onClick={() => {
+                  setCurrentStep("login")
+                  setPhoneNumber("")
+                  setVerificationCode(["", "", "", "", "", ""])
+                  setConfirmationResult(null)
+                  setConfigError("")
+                  setRecaptchaReady(false)
+                }}
+              >
                 Choose a different option
               </button>
-              <button className="continue-button" disabled>
-                Continue
+              <button
+                className="continue-button"
+                onClick={handleVerifySMSCode}
+                disabled={verificationCode.join("").length !== 6 || loading || !firebaseReady}
+              >
+                {loading ? "Verifying..." : firebaseReady ? "Verify Code" : "Setup Required"}
               </button>
             </>
           )}
