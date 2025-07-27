@@ -3,7 +3,7 @@
 
 import { useEffect, useState } from "react"
 import SearchBar from "../../Searchbar/search-bar"
-import headerImg from "../../assets/header-image.jpg"
+import headerVideo from "../../assets/header-bg.mp4"
 import "../styles/HeroSection.css"
 
 export default function HeroSection() {
@@ -19,14 +19,24 @@ export default function HeroSection() {
   }, [])
 
   return (
-    <section
-      className="hero"
-      style={{
-        backgroundImage: `url(${headerImg})`,
-        backgroundSize: "cover",
-        backgroundPosition: "center",
-      }}
-    >
+    <section className="hero">
+      <video
+        className="hero-video-bg"
+        src={headerVideo}
+        autoPlay
+        loop
+        muted
+        playsInline
+        style={{
+          position: "absolute",
+          top: 0,
+          left: 0,
+          width: "100%",
+          height: "100%",
+          objectFit: "cover",
+          zIndex: 0,
+        }}
+      />
       <div className="hero-overlay"></div>
 
       {/* Floating Elements */}
