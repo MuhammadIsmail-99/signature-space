@@ -9,7 +9,9 @@ export default function AgentCard({
 }) {
   return (
     <>
-      {agents.map((agent, index) => (
+      {agents.map((agent, index) => {
+        console.log("AgentCard rendered", agent.name);
+        return (
         <div
           key={agent.id}
           className={`agent-card animate-card ${cardsVisible ? "visible" : ""}`}
@@ -32,7 +34,8 @@ export default function AgentCard({
             Contact
           </button>
         </div>
-      ))}
+        );
+      })}
     </>
   )
 }

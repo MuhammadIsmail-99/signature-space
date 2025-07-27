@@ -14,6 +14,7 @@ import Footer from "../home/components/Footer.jsx"
 
 export default function ListingPage() {
   const [favorites, setFavorites] = useState([])
+  const [location, setLocation] = useState("");
   const [searchParams] = useSearchParams()
   const navigate = useNavigate()
   const cityFilterParam = searchParams.get("city")
@@ -203,7 +204,7 @@ export default function ListingPage() {
   return (
     <>
     <div className="app-wrapper">
-      <ListingHeader onApplyFilters={handleApplyFilters} initialFilters={appliedFilters} />
+      <ListingHeader onApplyFilters={handleApplyFilters} initialFilters={appliedFilters} location={location} setLocation={setLocation} />
       <div className="main-content-wrapper static-map-layout">
         <div className="listings-scrollable">
           <div className="listings-section">
@@ -223,7 +224,7 @@ export default function ListingPage() {
           </div>
         </div>
         <div className="map-static">
-          <MapSection />
+          <MapSection location={location} />
         </div>
       </div>
     </div>

@@ -77,7 +77,7 @@ const destinations = [
   },
 ]
 
-export default function ListingHeader({ onApplyFilters, initialFilters }) {
+export default function ListingHeader({ onApplyFilters, initialFilters, location, setLocation }) {
   const [isFilterPopupOpen, setIsFilterPopupOpen] = useState(false)
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
 
@@ -134,7 +134,7 @@ export default function ListingHeader({ onApplyFilters, initialFilters }) {
           </a>
         </div>
         <div className="header-search-bar-wrapper">
-          <ListingSearchBar /> {/* Use the new ListingSearchBar */}
+          <ListingSearchBar location={location} setLocation={setLocation} />
         </div>
         <div className="header-actions">
           <button className="filter-button" onClick={() => setIsFilterPopupOpen(true)}>

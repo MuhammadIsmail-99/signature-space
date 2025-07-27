@@ -886,6 +886,7 @@ body {
 
   .guests-dropdown {
     right: 16px;
+    top: 30%;
     left: 16px;
     width: auto;
     margin-top: 8px;
@@ -897,12 +898,14 @@ body {
   }
 
   .calendar-dropdown {
-    left: 16px;
-    right: 16px;
+    top: 30%;
+    /* left: 16px;
+    right: 16px; */
     padding: 16px;
   }
 
   .location-dropdown {
+    top: 30%;
     left: 16px;
     right: 16px;
     padding: 16px;
@@ -958,6 +961,7 @@ body {
   }
 
   .guests-dropdown {
+    top: 30%;
     right: 0;
     left: 0;
     margin: 8px 16px 0 16px;
@@ -998,6 +1002,7 @@ body {
   }
 
   .guests-dropdown {
+    top: 30%;
     right: 0;
     left: 0;
     margin: 8px 16px 0 16px;

@@ -72,9 +72,8 @@ const destinations = [
   },
 ]
 
-export default function SearchBar() {
+export default function SearchBar({ location, setLocation }) {
   const [activeSection, setActiveSection] = useState(null)
-  const [location, setLocation] = useState("")
   const [filteredDestinations, setFilteredDestinations] = useState(destinations)
   const [checkIn, setCheckIn] = useState(null)
   const [checkOut, setCheckOut] = useState(null)

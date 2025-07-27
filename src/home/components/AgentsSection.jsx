@@ -92,7 +92,7 @@ export default function AgentsSection() {
               className="agents-slider"
               style={{ transform: `translateX(-${agentsCurrentSlide * 280}px)` }}
             >
-              {/* Sell with top agents card */}
+              {/* Sell with top agents card as first item in row */}
               <div
                 className={`sell-agents-card animate-card ${cardsVisible ? "visible" : ""}`}
                 style={{
@@ -105,7 +105,6 @@ export default function AgentsSection() {
                   Top Agents
                 </button>
               </div>
-
               {/* Agent cards */}
               <AgentCard
                 agents={agents}
